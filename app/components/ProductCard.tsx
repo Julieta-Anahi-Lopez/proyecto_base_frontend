@@ -26,7 +26,7 @@ export default function ProductCard({ product }: ProductProps) {
       <div className="bg-gray-200 rounded-lg shadow-md overflow-hidden h-full flex flex-col">
         {/* Imagen */}
         <Image
-          src={product.image || "/placeholder.svg"}
+          src={product.image || "/Caja.webp"}
           alt={product.nombre}
           width={300}
           height={300}
