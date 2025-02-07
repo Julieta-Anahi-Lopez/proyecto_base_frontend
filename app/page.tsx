@@ -8,7 +8,7 @@ import CategoryMenu from "./components/CategoryMenu"
 import FilterBar from "./components/FilterBar"
 
 interface Product {
-  codigo: number
+  codigo: string
   nombre: string
   observ: string
   precio: number
@@ -19,7 +19,7 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
 
   useEffect(() => {
-    fetch("http://172.19.0.3:8000/articulos/")
+    fetch("http://172.19.0.3:8000/articulos/?nrogru=4&nrosub=&precio=&codigo=&nombre=&observ=")
       .then((response) => response.json())
       .then((data) => setProducts(data))
       .catch((error) => console.error("Error fetching products:", error))

@@ -21,12 +21,7 @@ export default function Header() {
             </li>
             <li>
               <Link href="/productos" className="hover:text-gray-600">
-                Productos
-              </Link>
-            </li>
-            <li>
-              <Link href="/sobre-nosotros" className="hover:text-gray-600">
-                Sobre Nosotros
+                Catálogo
               </Link>
             </li>
             <li>
