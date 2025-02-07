@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronRight, ChevronLeft, Menu, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 
 interface SubRubro {
   nrorub: number
@@ -34,35 +34,27 @@ export default function CategoryMenu() {
 
   return (
     <>
-      {/* 🔥 Botón para abrir menú en móviles */}
+      {/* 🔥 FAB flotante para abrir menú en móviles */}
       <button 
-        className="md:hidden fixed top-4 left-4 z-50 bg-blue-900 text-white p-2 rounded"
+        className="md:hidden fixed bottom-4 left-4 z-50 bg-blue-900 text-white p-3 rounded-full shadow-lg"
         onClick={() => setIsMobileOpen(true)}
       >
         <Menu className="w-6 h-6" />
       </button>
 
-      {/* 🔥 MODIFICADO: Menú lateral en pantallas grandes */}
+      {/* 🔥 Menú lateral en pantallas grandes */}
       <div 
         className={`hidden md:flex flex-col bg-blue-900 p-4 transition-all duration-300 ease-in-out 
                     ${isOpen ? "w-64" : "w-16 overflow-hidden min-w-[16px]"}`}
       >
-        {/* 🔥 MODIFICADO: Ocultar rubros cuando el menú está colapsado */}
         <button 
           onClick={() => setIsOpen(!isOpen)} 
           className="mb-4 flex items-center justify-between w-full text-white"
         >
-          {isOpen ? (
-            <>
-              <span className="text-lg font-semibold">Categorías</span>
-              <ChevronLeft className="w-5 h-5" />
-            </>
-          ) : (
-            <ChevronRight className="w-5 h-5" />
-          )}
+          {isOpen ? <span className="text-lg font-semibold">Categorías</span> : null}
+          <Menu className="w-5 h-5" />
         </button>
 
-        {/* 🔥 MODIFICADO: Ocultar los rubros si el menú está colapsado */}
         <ul className={`${isOpen ? "block" : "hidden"}`}>
           {rubros.map((rubro) => (
             <li key={rubro.codigo} className="mb-2">
@@ -87,9 +79,9 @@ export default function CategoryMenu() {
         </ul>
       </div>
 
-      {/* 🔥 Menú modal en móviles */}
+      {/* 🔥 Menú modal en móviles (aparece desde la izquierda) */}
       {isMobileOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex flex-col z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex z-[9999]">
           <div className="bg-blue-800 w-64 h-full p-4">
             <button 
               onClick={() => setIsMobileOpen(false)}
