@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import { Menu, X } from "lucide-react"
 
+const API_URL = process.env.API_URL || 'http://128.0.204.82:8001'
+
 interface SubRubro {
   nrorub: number
   codigo: number
@@ -26,8 +28,13 @@ export default function CategoryMenu() {
   }
 
   useEffect(() => {
-    fetch("http://128.0.204.82:8001/tipo-rubros-con-subrubros/")
-      .then((response) => response.json())
+    fetch(`${API_URL}/tipo-rubros-con-subrubros/`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Error en la respuesta del servidor')
+        }
+        return response.json()
+      })
       .then((data) => setRubros(data))
       .catch((error) => console.error("Error al obtener categorías:", error))
   }, [])
