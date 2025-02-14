@@ -14,6 +14,7 @@ interface Product {
   observ: string
   precio: number
   image: string
+  imagenes: { foto_1: string }[]
 }
 
 export default function Home() {
