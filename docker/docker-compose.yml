@@ -18,7 +18,7 @@ services:
 
 networks:
   proyecto_base_net:
-    external: true
+    
 
 
 

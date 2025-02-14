@@ -1,9 +1,27 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+
+interface Marca {
+  codigo: number
+  nombre: string
+  verweb: number
+}
 
 export default function FilterBar() {
   const [priceRange, setPriceRange] = useState(100)
+  const [marcas, setMarcas] = useState<Marca[]>([]) // 🔥 Estado para guardar las marcas
+
+  useEffect(() => {
+    fetch("http://128.0.204.82:8001/tipo-marcas/")
+      .then((response) => response.json())
+      .then((data) => {
+        // 🔥 Filtramos solo las marcas con verweb === 1
+        const marcasFiltradas = data.filter((marca: Marca) => marca.verweb === 1)
+        setMarcas(marcasFiltradas)
+      })
+      .catch((error) => console.error("Error al obtener las marcas:", error))
+  }, [])
 
   return (
     <div className="bg-gray-100 p-3 md:p-4 shadow-md overflow-hidden">
@@ -24,14 +42,14 @@ export default function FilterBar() {
             className="border border-gray-300 rounded-md px-3 py-2 w-full md:w-60"
           />
 
-          {/* Marca */}
-          <select className="border text-gray-600 border-gray-300 rounded-md px-3 py-2 w-full md:w-40">
+          {/* 🔥 Select de Marca con opciones dinámicas */}
+          <select className="border text-gray-600 border-gray-300 rounded-md px-3 py-2 w-full md:w-48">
             <option value="">Seleccione una marca</option>
-            <option value="Walker">Walker</option>
-            <option value="Hecspi">Hecspi</option>
-            <option value="Multimax">Multimax</option>
-            <option value="Algabo">Algabo</option>
-            <option value="Seiq">Seiq</option>
+            {marcas.map((marca) => (
+              <option key={marca.codigo} value={marca.codigo}>
+                {marca.nombre}
+              </option>
+            ))}
           </select>
 
           {/* Rango de Precios */}

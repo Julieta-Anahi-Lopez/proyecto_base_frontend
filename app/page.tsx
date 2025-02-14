@@ -19,7 +19,7 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
 
   useEffect(() => {
-    fetch("http://172.19.0.3:8000/articulos/")
+    fetch("http://128.0.204.82:8001/articulos/")
       .then((response) => response.json())
       .then((data) => setProducts(data))
       .catch((error) => console.error("Error fetching products:", error))

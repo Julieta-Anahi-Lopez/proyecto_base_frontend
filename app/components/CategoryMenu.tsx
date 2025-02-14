@@ -26,7 +26,7 @@ export default function CategoryMenu() {
   }
 
   useEffect(() => {
-    fetch("http://172.19.0.3:8000/tipo-rubros-con-subrubros/")
+    fetch("http://128.0.204.82:8001/tipo-rubros-con-subrubros/")
       .then((response) => response.json())
       .then((data) => setRubros(data))
       .catch((error) => console.error("Error al obtener categorías:", error))
