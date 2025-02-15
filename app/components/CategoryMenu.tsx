@@ -28,7 +28,7 @@ export default function CategoryMenu() {
   }
 
   useEffect(() => {
-    fetch(`${API_URL}/tipo-rubros-con-subrubros/`)
+    fetch(`http://localhost:8001/tipo-rubros-con-subrubros/`)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Error en la respuesta del servidor')

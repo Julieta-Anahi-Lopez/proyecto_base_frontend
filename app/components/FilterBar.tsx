@@ -14,7 +14,7 @@ export default function FilterBar() {
   const [marcas, setMarcas] = useState<Marca[]>([])
 
   useEffect(() => {
-    fetch(`${API_URL}/tipo-marcas/`)
+    fetch(`http://localhost:8001/tipo-marcas/`)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Error en la respuesta del servidor')
