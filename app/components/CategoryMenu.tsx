@@ -1,26 +1,29 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Menu, X } from "lucide-react"
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 
-const API_URL = process.env.API_URL || 'http://128.0.204.82:8001'
+import { Menu, X } from "lucide-react";
+import { setCategory } from "@/redux/slices/filtersSlice";
 
+const API_URL = "http://localhost:8001";
 interface SubRubro {
-  nrorub: number
-  codigo: number
-  nombre: string
+  nrorub: number;
+  codigo: number;
+  nombre: string;
 }
 
 interface Rubro {
-  codigo: number
-  nombre: string
-  subrubros: SubRubro[]
+  codigo: number;
+  nombre: string;
+  subrubros: SubRubro[];
 }
 
 export default function CategoryMenu() {
-  const [isOpen, setIsOpen] = useState(true)
-  const [isMobileOpen, setIsMobileOpen] = useState(false)
-  const [rubros, setRubros] = useState<Rubro[]>([]) 
+  const dispatch = useDispatch();// 🟢 Necesario para actualizar Redux
+  const [isOpen, setIsOpen] = useState(true);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [rubros, setRubros] = useState<Rubro[]>([]);
 
   function normalizeText(text: string) {
     if (!text) return "";
@@ -28,21 +31,21 @@ export default function CategoryMenu() {
   }
 
   useEffect(() => {
-    fetch(`http://localhost:8001/tipo-rubros-con-subrubros/`)
+    fetch(`${API_URL}/tipo-rubros-con-subrubros`)
       .then((response) => {
         if (!response.ok) {
-          throw new Error('Error en la respuesta del servidor')
+          throw new Error("Error en la respuesta del servidor");
         }
-        return response.json()
+        return response.json();
       })
       .then((data) => setRubros(data))
-      .catch((error) => console.error("Error al obtener categorías:", error))
-  }, [])
+      .catch((error) => console.error("Error al obtener categorías:", error));
+  }, []);
 
   return (
     <>
       {/* 🔥 FAB flotante para abrir menú en móviles */}
-      <button 
+      <button
         className="md:hidden fixed bottom-4 left-4 z-50 bg-blue-900 text-white p-3 rounded-full shadow-lg"
         onClick={() => setIsMobileOpen(true)}
       >
@@ -50,12 +53,12 @@ export default function CategoryMenu() {
       </button>
 
       {/* 🔥 Menú lateral en pantallas grandes */}
-      <div 
+      <div
         className={`hidden md:flex flex-col bg-blue-900 p-4 transition-all duration-300 ease-in-out 
                     ${isOpen ? "w-64" : "w-16 overflow-hidden min-w-[16px]"}`}
       >
-        <button 
-          onClick={() => setIsOpen(!isOpen)} 
+        <button
+          onClick={() => setIsOpen(!isOpen)}
           className="mb-4 flex items-center justify-between w-full text-white"
         >
           {isOpen ? <span className="text-lg font-semibold">Categorías</span> : null}
@@ -66,14 +69,23 @@ export default function CategoryMenu() {
           {rubros.map((rubro) => (
             <li key={rubro.codigo} className="mb-2">
               <details>
-                <summary className="cursor-pointer font-medium text-white text-lg">
+                <summary
+                  className="cursor-pointer font-medium text-white text-lg"
+                  onClick={() => dispatch(setCategory({ category: rubro.nombre }))}
+                >
                   {normalizeText(rubro.nombre)}
                 </summary>
                 {rubro.subrubros.length > 0 && (
                   <ul className="ml-4 mt-2">
                     {rubro.subrubros.map((subrubro) => (
                       <li key={`${subrubro.nrorub}-${subrubro.codigo}`} className="mb-1">
-                        <a href="#" className="text-slate-300 hover:underline text-md">
+                        <a
+                          href="#"
+                          className="text-slate-300 hover:underline text-md"
+                          onClick={() =>
+                            dispatch(setCategory({ category: rubro.nombre, subcategory: subrubro.nombre }))
+                          }
+                        >
                           {normalizeText(subrubro.nombre)}
                         </a>
                       </li>
@@ -90,24 +102,30 @@ export default function CategoryMenu() {
       {isMobileOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex z-[9999]">
           <div className="bg-blue-800 w-64 h-full p-4">
-            <button 
-              onClick={() => setIsMobileOpen(false)}
-              className="mb-4 text-white flex justify-end"
-            >
+            <button onClick={() => setIsMobileOpen(false)} className="mb-4 text-white flex justify-end">
               <X className="w-6 h-6" />
             </button>
             <ul>
               {rubros.map((rubro) => (
                 <li key={rubro.codigo} className="mb-2">
                   <details>
-                    <summary className="cursor-pointer font-medium text-white text-lg">
+                    <summary
+                      className="cursor-pointer font-medium text-white text-lg"
+                      onClick={() => dispatch(setCategory({ category: rubro.nombre }))}
+                    >
                       {normalizeText(rubro.nombre)}
                     </summary>
                     {rubro.subrubros.length > 0 && (
                       <ul className="ml-4 mt-2">
                         {rubro.subrubros.map((subrubro) => (
                           <li key={`${subrubro.nrorub}-${subrubro.codigo}`} className="mb-1">
-                            <a href="#" className="text-slate-300 hover:underline text-md">
+                            <a
+                              href="#"
+                              className="text-slate-300 hover:underline text-md"
+                              onClick={() =>
+                                dispatch(setCategory({ category: rubro.nombre, subcategory: subrubro.nombre }))
+                              }
+                            >
                               {normalizeText(subrubro.nombre)}
                             </a>
                           </li>
@@ -122,5 +140,5 @@ export default function CategoryMenu() {
         </div>
       )}
     </>
-  )
+  );
 }

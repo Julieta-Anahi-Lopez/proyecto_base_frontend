@@ -21,6 +21,7 @@ export default function Header() {
               alt="Logo Klinner"
               width={160}
               height={80}
+              priority={true}
               className="object-contain"
             />
           </Link>
@@ -32,6 +33,7 @@ export default function Header() {
               alt="Logo Walker"
               width={140}
               height={50}
+              priority={true}
               className="object-contain"
             />
             <span className="text-white text-sm font-semibold">Representante Oficial Walker</span>
