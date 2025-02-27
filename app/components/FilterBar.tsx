@@ -36,7 +36,7 @@ export default function FilterBar() {
     fetch(`${API_URL}/tipo-marcas/`)
       .then((response) => response.json())
       .then((data) => {
-        const marcasFiltradas = data.filter((marca: Marca) => marca.verweb === 1);
+        const marcasFiltradas = data.filter((marca: Marca) =>marca.verweb === 0 || marca.verweb === 1);
         setMarcas(marcasFiltradas);
       })
       .catch((error) => console.error("Error al obtener las marcas:", error));
