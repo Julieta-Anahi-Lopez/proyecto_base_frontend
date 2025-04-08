@@ -1,4 +1,4 @@
-// Actualiza tu store.ts
+// store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import filtersReducer from './slices/filtersSlice';
 import cartReducer from './slices/cartSlice';

@@ -14,6 +14,22 @@ import { store } from '../redux/store';
 import { restoreAuth } from '../redux/slices/authSlice';
 import { createSelector } from '@reduxjs/toolkit';
 
+// // Código temporal para limpiar tokens
+// useEffect(() => {
+//   console.log("🧹 Limpiando tokens antiguos...");
+//   if (typeof window !== 'undefined') {
+//     localStorage.removeItem('auth_token');
+//     localStorage.removeItem('refresh_token');
+//     localStorage.removeItem('user');
+//     console.log("🧹 Tokens eliminados del localStorage");
+    
+//     // Redirigir al login después de limpiar
+//     setTimeout(() => {
+//       window.location.href = '/login';
+//     }, 500);
+//   }
+// }, []);
+
 interface Product {
   codigo: string;
   nombre: string;
@@ -56,6 +72,19 @@ export default function Home() {
   const selectedCode = useSelector(getSelectedCode);
   const selectedName = useSelector(getSelectedName);
 
+
+    // Agregar esto al inicio del componente Home
+    useEffect(() => {
+      // Este efecto se ejecuta solo una vez al montar el componente
+      console.log("🔵 Componente Home montado");
+      
+      return () => {
+        // Limpieza cuando el componente se desmonta
+        console.log("🔵 Componente Home desmontado");
+        setAuthChecked(false); // Resetear el estado para futuras visitas a la página
+      };
+    }, []);
+
   // NUEVO USEEFFECT: Verificación de autenticación
   useEffect(() => {
     // Verificar autenticación solo una vez
@@ -81,24 +110,48 @@ export default function Home() {
     }
   }, [isAuthenticated, token, authChecked, router]);
 
-  // USEEFFECT MODIFICADO: Cargar productos
   useEffect(() => {
-    // No cargar productos si la autenticación aún no se ha verificado
-    if (!authChecked || !authState.isAuthenticated || !authState.token) {
+    console.log("🔵 Verificando autenticación antes de cargar productos");
+    
+    // Verificación directa de localStorage como fallback
+    const hasLocalStorageAuth = typeof window !== 'undefined' && !!localStorage.getItem('auth_token');
+    
+    console.log("🔍 Valores actuales:", { 
+      authChecked, 
+      reduxAuth: authState.isAuthenticated, 
+      reduxToken: !!authState.token,
+      hasLocalStorageAuth
+    });
+    
+    // Usar una condición más flexible que incluye localStorage
+    if (!authChecked || (!authState.isAuthenticated && !hasLocalStorageAuth)) {
+      console.log("🔴 No hay autenticación válida para cargar productos");
       return;
     }
-
+    
+    console.log("✅ Autenticación verificada, cargando productos...");
+    
     const loadProducts = async () => {
       try {
         setLoading(true);
-        const data = await apiService.getProducts({
-          nrogru: filters.category,
-          nrosub: filters.subcategory,
-          precio_max: filters.precio_max,
-          nromar: filters.nromar,
-          codigo: filters.codigo,
-          nombre: filters.nombre
+        
+        // Usar el token de Redux o directamente de localStorage
+        const effectiveToken = authState.token || localStorage.getItem('auth_token');
+        
+        // Usar fetchApi directamente para tener más control
+        const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articulos`, {
+          headers: {
+            'Authorization': `Bearer ${effectiveToken}`,
+            'Content-Type': 'application/json'
+          }
+        }).then(response => {
+          if (!response.ok) {
+            throw new Error(`Error en la API: ${response.status}`);
+          }
+          return response.json();
         });
+        
+        console.log("📦 Datos recibidos:", data);
         setProducts(data);
         setError(null);
       } catch (err) {
@@ -108,7 +161,7 @@ export default function Home() {
         setLoading(false);
       }
     };
-
+    
     loadProducts();
   }, [
     filters.category, 
@@ -162,19 +215,21 @@ export default function Home() {
     );
   }
 
+
+
+
   // El render principal se mantiene igual
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <FilterBar />
+      <FilterBar token={token} />
       <main className="flex-grow flex flex-col md:flex-row bg-current">
-        <CategoryMenu />
+        <CategoryMenu token={token} />
         <ProductGrid products={products} />
       </main>
       <Footer />
     </div>
   );
-}
 
 
 

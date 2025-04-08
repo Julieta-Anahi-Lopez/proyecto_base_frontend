@@ -1,28 +1,29 @@
 // components/withAuth.tsx
 "use client";
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation'; // Cambiado de next/router a next/navigation para Next.js 13+
 import { useEffect } from 'react';
-import { useAppSelector } from '../../redux/hooks';
+import { useSelector } from 'react-redux'; // Usar useSelector directamente
 import { ComponentType } from 'react';
+import { RootState } from '@/store';
+
+// Selectores fuera del componente
+const selectAuth = (state: RootState) => state.auth;
 
 // HOC para proteger rutas que requieren autenticación
 const withAuth = <P extends object>(WrappedComponent: ComponentType<P>) => {
   const WithAuthComponent = (props: P) => {
-    const { isAuthenticated, loading } = useAppSelector(state => ({
-      isAuthenticated: state.auth.isAuthenticated,
-      loading: state.auth.loading
-    }));
+    const auth = useSelector(selectAuth);
     const router = useRouter();
 
     useEffect(() => {
-      // Si no está autenticado y no está cargando, redirigir al login
-      if (!loading && !isAuthenticated) {
+      // Solo verificar una vez que la autenticación está inicializada
+      if (auth.initialized && !auth.isAuthenticated) {
         router.replace('/login');
       }
-    }, [isAuthenticated, loading, router]);
+    }, [auth.initialized, auth.isAuthenticated, router]);
 
     // Mientras verifica autenticación, mostrar spinner
-    if (loading || !isAuthenticated) {
+    if (!auth.initialized || (auth.initialized && !auth.isAuthenticated)) {
       return (
         <div className="min-h-screen flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>

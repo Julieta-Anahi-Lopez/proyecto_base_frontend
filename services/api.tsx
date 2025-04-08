@@ -1,3 +1,4 @@
+//services/api.tsx
 import { store } from '../store'; // Asegúrate que esta ruta sea correcta
 import { logout } from '../redux/slices/authSlice';
 
@@ -48,10 +49,21 @@ const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
 
     // Manejar token expirado/inválido
     if (response.status === 401) {
-      console.log('🔴 Error de autenticación (401) - Cerrando sesión');
+      // Limpiar la sesión y tokens
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      
       store.dispatch(logout());
+      
+      // Redirigir a la página de login
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+      
       throw new Error('Sesión expirada. Por favor inicie sesión nuevamente.');
     }
+
 
     // Para respuestas no-JSON (como 204 No Content)
     if (response.status === 204) {
