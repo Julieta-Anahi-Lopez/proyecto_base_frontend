@@ -85,27 +85,16 @@ export default function ProductCard({ product }: ProductProps) {
 </div>
 
       {/* Modal con toda la información */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <h2 className="text-2xl font-bold mb-4">{normalizeText(product.nombre)}</h2>
-        <div className="relative h-64 bg-gray-100 mb-4">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={normalizeText(product.nombre)} description={product.observ}>
+        <div className="relative h-80 bg-gray-100 mb-4">
           <Image
             src={productImage}
             alt={product.nombre}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-contain p-2"
+            className="object-contain p-6"
           />
         </div>
-        <p className="text-gray-700 mb-4">{normalizeText(product.observ)}</p>
-        <p className="text-2xl font-bold text-blue-600 mb-6">${product.precio.toFixed(2)}</p>
-        
-        {/* Botón para agregar al carrito dentro del modal */}
-        <button
-          onClick={handleAddToCart}
-          className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
-        >
-          🛒 Agregar al Carrito
-        </button>
       </Modal>
     </>
   );
@@ -114,6 +103,26 @@ export default function ProductCard({ product }: ProductProps) {
 
 
 
+{/* <h2 className="text-2xl font-bold mb-4">{normalizeText(product.nombre)}</h2>
+<div className="relative h-64 bg-gray-100 mb-4">
+  <Image
+    src={productImage}
+    alt={product.nombre}
+    fill
+    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+    className="object-contain p-2"
+  />
+</div>
+<p className="text-gray-700 mb-4">{normalizeText(product.observ)}</p>
+<p className="text-2xl font-bold text-blue-600 mb-6">${product.precio.toFixed(2)}</p>
+
+{/* Botón para agregar al carrito dentro del modal */}
+{/* <button
+  onClick={handleAddToCart}
+  className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
+>
+  🛒 Agregar al Carrito
+</button>  */}
 
 
 
