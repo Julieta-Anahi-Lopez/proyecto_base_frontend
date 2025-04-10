@@ -33,12 +33,34 @@ const cartSlice = createSlice({
         localStorage.setItem("cart", JSON.stringify(state.items)); // Guardar en localStorage
       }
     },
-    // Eliminar un producto del carrito
-    removeFromCart: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter((item) => item.codigo !== action.payload);
-      // Verificar que estamos en el navegador antes de usar localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem("cart", JSON.stringify(state.items)); // Actualizar localStorage
+    // Eliminar un producto del carrito o reducir su cantidad
+    removeFromCart: (state, action: PayloadAction<string | { codigo: string, removeCompletely?: boolean }>) => {
+      let codigo: string;
+      let removeCompletely: boolean = false;
+
+      // Determinar si queremos eliminar por completo o solo reducir cantidad
+      if (typeof action.payload === 'string') {
+        codigo = action.payload;
+      } else {
+        codigo = action.payload.codigo;
+        removeCompletely = action.payload.removeCompletely || false;
+      }
+
+      const itemIndex = state.items.findIndex((item) => item.codigo === codigo);
+      
+      if (itemIndex !== -1) {
+        if (removeCompletely || state.items[itemIndex].cantidad <= 1) {
+          // Si removeCompletely es true o solo queda 1 unidad, eliminamos el producto
+          state.items = state.items.filter((item) => item.codigo !== codigo);
+        } else {
+          // Si hay más de 1 unidad y no queremos eliminar por completo, reducimos en 1
+          state.items[itemIndex].cantidad -= 1;
+        }
+        
+        // Actualizar localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('cart', JSON.stringify(state.items));
+        }
       }
     },
     // Vaciar el carrito
