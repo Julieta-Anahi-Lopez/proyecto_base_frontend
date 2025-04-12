@@ -78,7 +78,7 @@ export default function PedidoConfirmadoPage() {
               Volver al inicio
             </Link>
             <Link 
-              href="/productos" 
+              href="/" 
               className="text-center border border-blue-600 text-blue-600 px-6 py-3 rounded-md font-medium hover:bg-blue-50 transition-colors"
             >
               Seguir comprando
