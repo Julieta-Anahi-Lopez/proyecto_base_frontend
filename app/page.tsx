@@ -55,6 +55,49 @@ interface Order {
   total: number;
 }
 
+// En app/page.tsx - añadir la interface para los pedidos
+interface PedidoDetalle {
+  compro: string;
+  nroord: number;
+  codart: string;
+  cantid: number;
+  descri: string;
+  penden: number;
+  pendfc: number;
+  precio: number;
+  nrolis: number;
+  pordes: number;
+  nroemp: number;
+  observ: string;
+  poruni: number;
+}
+
+interface Pedido {
+  compro: string;
+  detalles: PedidoDetalle[];
+  nrocli: number;
+  fecped: string;
+  plazo: string;
+  lugent: string;
+  condic: string;
+  observ: string;
+  nrousu: number;
+  nroven: number;
+  imputa: number;
+  nombpc: string;
+  origen: string;
+  nroemp: number;
+  tipdep: number;
+  nroest: string;
+}
+
+interface PedidosResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Pedido[];
+}
+
 // Definición de selectores para Redux fuera del componente
 const getAuthState = (state: RootState) => 
   'auth' in state ? state.auth : { token: null, isAuthenticated: false };
@@ -77,6 +120,8 @@ export default function Home() {
   const [marcas, setMarcas] = useState<Marca[]>([]);
   const router = useRouter();
   
+
+
   // Estados para control de autenticación y carga
   const [authChecked, setAuthChecked] = useState(false);
   const [hasLocalStorageAuth, setHasLocalStorageAuth] = useState(false);
@@ -104,6 +149,10 @@ export default function Home() {
   
   // Obtener los items del carrito
   const cartItems = useSelector(getCartItems);
+
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [pedidosLoading, setPedidosLoading] = useState(false);
+  const [pedidosError, setPedidosError] = useState<string | null>(null);
 
   // useEffect para registrar el montaje/desmontaje del componente
   useEffect(() => {
@@ -422,6 +471,55 @@ const handleSubmitOrder = async (observaciones: string): Promise<boolean> => {
   }
 };
   
+
+// En app/page.tsx - añadir este estado y efecto
+// const [pedidos, setPedidos] = useState<Pedido[]>([]);
+// const [pedidosLoading, setPedidosLoading] = useState(false);
+// const [pedidosError, setPedidosError] = useState<string | null>(null);
+
+// Agregar un efecto para cargar los pedidos
+useEffect(() => {
+  if (!authChecked || (!authState.isAuthenticated && !hasLocalStorageAuth)) {
+    return;
+  }
+  
+  const loadPedidos = async () => {
+    try {
+      setPedidosLoading(true);
+      
+      // Obtener token efectivo
+      const effectiveToken = authState.token || localStorage.getItem('auth_token');
+      
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/pedidos/usuario/mis-pedidos/`;
+      
+      console.log("🔍 Cargando pedidos del usuario:", url);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${effectiveToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error en la API de pedidos: ${response.status}`);
+      }
+      
+      const pedidosData: PedidosResponse = await response.json();
+      setPedidos(pedidosData.results);
+      
+      console.log("📦 Pedidos cargados correctamente:", pedidosData.results.length);
+      setPedidosError(null);
+    } catch (err) {
+      setPedidosError(err instanceof Error ? err.message : 'Error desconocido al cargar pedidos');
+      console.error("Error al cargar pedidos:", err);
+    } finally {
+      setPedidosLoading(false);
+    }
+  };
+  
+  loadPedidos();
+}, [authChecked, authState.isAuthenticated, authState.token, hasLocalStorageAuth]);
   // Logs de depuración para ver cambios en los estados principales
   useEffect(() => {
     console.log("🟣 Estado actualizado de productos:", products.length);
@@ -438,6 +536,9 @@ const handleSubmitOrder = async (observaciones: string): Promise<boolean> => {
   useEffect(() => {
     console.log("🟣 Estado actualizado de filtros:", filters);
   }, [filters]);
+
+
+
 
   // Renderizado condicional: Spinner mientras verifica autenticación
   if (!authChecked) {
@@ -474,37 +575,62 @@ const handleSubmitOrder = async (observaciones: string): Promise<boolean> => {
     );
   }
 
+// En app/page.tsx - modificar el return
+return (
+  <div className="flex flex-col min-h-screen">
+    <Header pedidos={pedidos} pedidosLoading={pedidosLoading}  onSubmitOrder={handleSubmitOrder}/>
+    <FilterBar marcas={marcas} />
+    <main className="flex-grow flex flex-col md:flex-row bg-current">
+      <CategoryMenu rubros={rubros} />
+      <div className="flex-grow">
+        {loading ? (
+          <div className="flex items-center justify-center h-full p-8">
+            <div className="text-blue-500 animate-pulse">Actualizando productos...</div>
+          </div>
+        ) : (
+          <ProductGrid products={products} />
+        )}
+      </div>
+    </main>
+    <Footer />
+  </div>
+);
+
+
+
+
+
   // Renderizado principal con la estructura de la página
-  return (
-    <div className="flex flex-col min-h-screen">
-      {/* Cabecera con logo y menú - pasamos la función handleSubmitOrder como prop */}
-      <Header onSubmitOrder={handleSubmitOrder} />
+//   return (
+//     <div className="flex flex-col min-h-screen">
+//       {/* Cabecera con logo y menú - pasamos la función handleSubmitOrder como prop */}
+//       <Header onSubmitOrder={handleSubmitOrder} />
       
-      {/* Barra de filtros */}
-      <FilterBar marcas={marcas} />
+//       {/* Barra de filtros */}
+//       <FilterBar marcas={marcas} />
       
-      {/* Contenido principal */}
-      <main className="flex-grow flex flex-col md:flex-row bg-gray-50">
-        {/* Menú lateral de categorías */}
-        <CategoryMenu rubros={rubros} />
+//       {/* Contenido principal */}
+//       <main className="flex-grow flex flex-col md:flex-row bg-gray-50">
+//         {/* Menú lateral de categorías */}
+//         <CategoryMenu rubros={rubros} />
         
-        {/* Área principal de productos */}
-        <div className="flex-grow">
-          {/* Mostrar indicador de carga o la cuadrícula de productos */}
-          {loading ? (
-            <div className="flex items-center justify-center h-full p-8">
-              <div className="text-blue-500 animate-pulse">Actualizando productos...</div>
-            </div>
-          ) : (
-            <ProductGrid products={products} />
-          )}
-        </div>
-      </main>
+//         {/* Área principal de productos */}
+//         <div className="flex-grow">
+//           {/* Mostrar indicador de carga o la cuadrícula de productos */}
+//           {loading ? (
+//             <div className="flex items-center justify-center h-full p-8">
+//               <div className="text-blue-500 animate-pulse">Actualizando productos...</div>
+//             </div>
+//           ) : (
+//             <ProductGrid products={products} />
+//           )}
+//         </div>
+//       </main>
       
-      {/* Pie de página */}
-      <Footer />
-    </div>
-  );
-}
+//       {/* Pie de página */}
+//       <Footer />
+//     </div>
+//   );
+// }
 
 
