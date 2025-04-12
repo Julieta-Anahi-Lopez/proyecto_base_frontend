@@ -277,89 +277,89 @@ export default function Home() {
     filters
   ]);
   
-  // Función para enviar el pedido al servidor
-  const handleSubmitOrder = async (observaciones: string): Promise<boolean> => {
-    // Verificar si hay items en el carrito
-    if (cartItems.length === 0) {
-      setOrderError("No hay productos en el carrito");
+// Función para enviar el pedido al servidor
+// Función para enviar el pedido al servidor
+const handleSubmitOrder = async (observaciones: string): Promise<boolean> => {
+  // Verificar si hay items en el carrito
+  if (cartItems.length === 0) {
+    setOrderError("No hay productos en el carrito");
+    return false;
+  }
+  
+  try {
+    setIsSubmittingOrder(true);
+    setOrderError(null);
+    
+    // Obtener token efectivo
+    const effectiveToken = authState.token || localStorage.getItem('auth_token');
+    
+    if (!effectiveToken) {
+      setOrderError("No hay sesión activa");
       return false;
     }
     
-    try {
-      setIsSubmittingOrder(true);
-      setOrderError(null);
-      
-      // Obtener token efectivo
-      const effectiveToken = authState.token || localStorage.getItem('auth_token');
-      
-      if (!effectiveToken) {
-        setOrderError("No hay sesión activa");
-        return false;
-      }
-      
-      // Calcular el total del pedido
-      const total = cartItems.reduce(
-        (acc, item) => acc + (item.precio * item.cantidad), 
-        0
+    // Preparar los ítems del pedido según el formato requerido por la API
+    // Aseguramos que observacion no sea vacía o null
+    const detalleItems = cartItems.map(item => ({
+      codigo: item.codigo,
+      cantidad: item.cantidad,
+      precio: item.precio,
+      descuento: 0, // Por defecto sin descuento
+      observacion: "Sin observaciones" // Valor por defecto para evitar valores null o vacíos
+    }));
+    
+    // Preparar el objeto de pedido según el formato requerido
+    // Aseguramos que observ no sea vacía o null
+    const pedidoData = {
+      observ: observaciones && observaciones.trim() !== "" 
+        ? observaciones 
+        : "Sin observaciones", // Valor por defecto para evitar valores null o vacíos
+      detalle: detalleItems
+    };
+    
+    console.log("🛒 Enviando pedido:", pedidoData);
+    
+    // Realizar la petición POST
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pedidos/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${effectiveToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(pedidoData)
+    });
+    
+    // Procesar la respuesta
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(
+        errorData?.detail || 
+        `Error al enviar el pedido: ${response.status} ${response.statusText}`
       );
-      
-      // Preparar los ítems del pedido
-      const orderItems: OrderItem[] = cartItems.map(item => ({
-        codigo: item.codigo,
-        cantidad: item.cantidad,
-        precio: item.precio
-      }));
-      
-      // Preparar el objeto de pedido
-      const orderData: Order = {
-        items: orderItems,
-        observaciones: observaciones || "",
-        total: total
-      };
-      
-      console.log("🛒 Enviando pedido:", orderData);
-      
-      // Realizar la petición POST
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pedidos/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${effectiveToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderData)
-      });
-      
-      // Procesar la respuesta
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(
-          errorData?.detail || 
-          `Error al enviar el pedido: ${response.status} ${response.statusText}`
-        );
-      }
-      
-      const responseData = await response.json();
-      console.log("✅ Pedido enviado correctamente:", responseData);
-      
-      // Manejar respuesta exitosa
-      setOrderSuccess(true);
-      
-      // Aquí podrías vaciar el carrito si lo deseas
-      // dispatch(clearCart());
-      
-      return true;
-    } catch (error) {
-      // Manejar errores
-      console.error("Error al enviar pedido:", error);
-      
-      setOrderSuccess(false);
-      setOrderError(error instanceof Error ? error.message : 'Error desconocido al enviar pedido');
-      
-      return false;
-    } finally {
-      setIsSubmittingOrder(false);
     }
-  };
+    
+    const responseData = await response.json();
+    console.log("✅ Pedido enviado correctamente:", responseData);
+    
+    // Manejar respuesta exitosa
+    setOrderSuccess(true);
+    
+    // Aquí podrías vaciar el carrito si lo deseas
+    // dispatch(clearCart());
+    
+    return true;
+  } catch (error) {
+    // Manejar errores
+    console.error("Error al enviar pedido:", error);
+    
+    setOrderSuccess(false);
+    setOrderError(error instanceof Error ? error.message : 'Error desconocido al enviar pedido');
+    
+    return false;
+  } finally {
+    setIsSubmittingOrder(false);
+  }
+};
   
   // Logs de depuración para ver cambios en los estados principales
   useEffect(() => {
