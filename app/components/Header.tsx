@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, ShoppingCart, Minus, Plus, Trash2 } from "lucide-react";
+import { usePathname } from "next/navigation"; // Importamos usePathname
+import { Menu, X, ShoppingCart, User, LogIn, Minus, Plus, Trash2 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
@@ -59,8 +60,15 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartPreviewOpen, setIsCartPreviewOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false); // Nuevo estado para modal completo
+    // Obtener la ruta actual
+  const pathname = usePathname();
+  const isCatalogPage = pathname === '/catalogo' || pathname === '/productos';
+
+
+
 
   const dispatch = useDispatch();
+
 
   // Usar el selector memoizado
   const cartItems = useSelector(getCartItems);
@@ -120,6 +128,7 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
           <Link href="/" className="hover:text-gray-300">Inicio</Link>
           <Link href="/catalogo" className="hover:text-gray-300">Catálogo</Link>
           <Link href="/contacto" className="hover:text-gray-300">Contacto</Link>
+          
 
           {/* Ícono del carrito con vista previa mejorada */}
           <div
