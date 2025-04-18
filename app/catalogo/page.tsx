@@ -166,96 +166,131 @@ export default function CatalogoPage() {
   }, []);
 
  // useEffect para verificar la autenticación del usuario - Versión mejorada
+// En el useEffect de verificación de autenticación de CatalogoPage
 useEffect(() => {
   // Si ya verificamos, no hacemos nada
   if (authChecked) return;
   
-  // Función para verificar la autenticación
-  const checkAuth = async () => {
-    try {
-      console.log("Verificando autenticación...");
-      
-      // Primero verificamos si hay token en Redux
-      if (isAuthenticated && token) {
-        console.log("Usuario ya autenticado en Redux");
-        setAuthChecked(true);
-        return;
-      }
-      
-      // Si no hay en Redux, verificamos localStorage
-      const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-      setHasLocalStorageAuth(!!localStorageToken);
-      
-      if (localStorageToken) {
-        console.log("Token encontrado en localStorage, intentando restaurar");
-        
-        // Intentar restaurar desde localStorage a Redux
-        store.dispatch(restoreAuth());
-        const updatedState = store.getState()?.auth || {};
-        console.log("Estoy en updatedState",updatedState)
-        
-        // Verificar si la restauración funcionó
-        // const updatedState = store.getState().auth;
-        
-        if (updatedState.isAuthenticated && updatedState.token) {
-          console.log("Autenticación restaurada desde localStorage");
-          setAuthChecked(true);
-          return;
-        } else {
-          console.log("Token en localStorage pero no es válido");
-          
-          // Intentamos validar el token haciendo una petición de prueba
-          const effectiveToken = localStorageToken;
-          
-          try {
-            // Hacer una petición simple para verificar si el token es válido
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario/`, {
-              headers: {
-                'Authorization': `Bearer ${effectiveToken}`,
-                'Content-Type': 'application/json'
-              }
-            });
-            
-            if (response.ok) {
-              console.log("Token validado mediante petición de prueba");
-              setAuthChecked(true);
-              return;
-            } else {
-              console.log("Token inválido, redirigiendo a login");
-              // Si el token no es válido, lo eliminamos
-              localStorage.removeItem('auth_token');
-              localStorage.removeItem('refresh_token');
-              localStorage.removeItem('user');
-              router.push('/login');
-              return;
-            }
-          } catch (error) {
-            console.error("Error al validar token:", error);
-            // Si hay un error en la validación, asumimos que no es válido
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('refresh_token');
-            localStorage.removeItem('user');
-            router.push('/login');
-            return;
-          }
-        }
-      }
-      
-      // Si no hay token ni en Redux ni en localStorage, redirigir a login
-      console.log("No hay token válido, redirigiendo a login");
-      router.push('/login');
-      
-    } catch (error) {
-      console.error("Error en verificación de autenticación:", error);
-      // Si hay un error, redirigimos a login por seguridad
-      router.push('/login');
-    }
-  };
+  console.log("Verificando autenticación...");
   
-  // Ejecutar la verificación
-  checkAuth();
+  // Verificar si hay token en Redux
+  if (isAuthenticated && token) {
+    console.log("Usuario ya autenticado en Redux");
+    setAuthChecked(true);
+    return;
+  }
+  
+  // Verificar si hay token en localStorage
+  const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  
+  if (localStorageToken) {
+    console.log("Token encontrado en localStorage, confiando en su validez");
+    console.log("LocalStorageToken: ", localStorageToken)
+    
+    // Confiamos en que el token es válido si existe
+    store.dispatch(restoreAuth());
+    setAuthChecked(true);
+    setHasLocalStorageAuth(true);
+    return;
+  }
+  
+  // Si no hay token ni en Redux ni en localStorage, redirigir a login
+  console.log("No hay token válido, redirigiendo a login");
+  router.push('/login');
   
 }, [isAuthenticated, token, authChecked, router]);
+
+
+ // useEffect(() => {
+//   // Si ya verificamos, no hacemos nada
+//   if (authChecked) return;
+  
+//   // Función para verificar la autenticación
+//   const checkAuth = async () => {
+//     try {
+//       console.log("Verificando autenticación...");
+      
+//       // Primero verificamos si hay token en Redux
+//       if (isAuthenticated && token) {
+//         console.log("Usuario ya autenticado en Redux");
+//         setAuthChecked(true);
+//         return;
+//       }
+      
+//       // Si no hay en Redux, verificamos localStorage
+//       const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+//       setHasLocalStorageAuth(!!localStorageToken);
+      
+//       if (localStorageToken) {
+//         console.log("Token encontrado en localStorage, intentando restaurar");
+        
+//         // Intentar restaurar desde localStorage a Redux
+//         store.dispatch(restoreAuth());
+//         const updatedState = store.getState()?.auth || {};
+//         console.log("Estoy en updatedState",updatedState)
+        
+//         // Verificar si la restauración funcionó
+//         // const updatedState = store.getState().auth;
+        
+//         if (updatedState.isAuthenticated && updatedState.token) {
+//           console.log("Autenticación restaurada desde localStorage");
+//           setAuthChecked(true);
+//           return;
+//         } else {
+//           console.log("Token en localStorage pero no es válido");
+          
+//           // Intentamos validar el token haciendo una petición de prueba
+//           const effectiveToken = localStorageToken;
+          
+//           try {
+//             // Hacer una petición simple para verificar si el token es válido
+//             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario/`, {
+//               headers: {
+//                 'Authorization': `Bearer ${effectiveToken}`,
+//                 'Content-Type': 'application/json'
+//               }
+//             });
+            
+//             if (response.ok) {
+//               console.log("Token validado mediante petición de prueba");
+//               setAuthChecked(true);
+//               return;
+//             } else {
+//               console.log("Token inválido, redirigiendo a login");
+//               // Si el token no es válido, lo eliminamos
+//               localStorage.removeItem('auth_token');
+//               localStorage.removeItem('refresh_token');
+//               localStorage.removeItem('user');
+//               router.push('/login');
+//               return;
+//             }
+//           } catch (error) {
+//             console.error("Error al validar token:", error);
+//             // Si hay un error en la validación, asumimos que no es válido
+//             localStorage.removeItem('auth_token');
+//             localStorage.removeItem('refresh_token');
+//             localStorage.removeItem('user');
+//             router.push('/login');
+//             return;
+//           }
+//         }
+//       }
+      
+//       // Si no hay token ni en Redux ni en localStorage, redirigir a login
+//       console.log("No hay token válido, redirigiendo a login");
+//       router.push('/login');
+      
+//     } catch (error) {
+//       console.error("Error en verificación de autenticación:", error);
+//       // Si hay un error, redirigimos a login por seguridad
+//       router.push('/login');
+//     }
+//   };
+  
+//   // Ejecutar la verificación
+//   checkAuth();
+  
+// }, [isAuthenticated, token, authChecked, router]);
 
   // useEffect para cargar datos iniciales (categorías y marcas)
   useEffect(() => {
