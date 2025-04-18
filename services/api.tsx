@@ -1,7 +1,10 @@
 //services/api.tsx
 import { store } from '../store'; // Asegúrate que esta ruta sea correcta
 import { logout } from '../redux/slices/authSlice';
+import { useRouter } from 'next/router';
 
+
+const router = useRouter();
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 // Helper para construir query strings
@@ -58,7 +61,12 @@ const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
       
       // Redirigir a la página de login
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        // Usamos replace en lugar de window.location.href para una mejor experiencia
+        // window.location.replace('/login');
+        router.push('/login');
+        
+        // Detener la ejecución para evitar que se procese más código
+        return new Promise(() => {});
       }
       
       throw new Error('Sesión expirada. Por favor inicie sesión nuevamente.');
