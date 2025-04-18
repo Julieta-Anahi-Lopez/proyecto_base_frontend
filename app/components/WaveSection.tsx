@@ -12,7 +12,7 @@ interface WaveSectionProps {
 export default function WaveSection({ 
   children, 
   className = "", 
-  bgColor = "bg-blue-600"
+  bgColor = "bg-blue-900"
 }: WaveSectionProps) {
   return (
     <section className={`relative ${bgColor} ${className} overflow-hidden`}>

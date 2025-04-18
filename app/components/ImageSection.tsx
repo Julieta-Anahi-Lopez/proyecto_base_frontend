@@ -33,7 +33,7 @@ export default function ImageSection({
   return (
     <section className="relative w-full">
       {/* Onda superior (opcional) */}
-      {topWave && (
+      {/* {topWave && (
         <div className="absolute top-0 left-0 w-full overflow-hidden z-10 h-16">
           <svg
             className="absolute w-full"
@@ -49,7 +49,7 @@ export default function ImageSection({
             ></path>
           </svg>
         </div>
-      )}
+      )} */}
 
       {/* Solo imagen en pantallas pequeñas y medianas */}
       <div className={`relative w-full ${height} block lg:hidden`}>
@@ -96,7 +96,7 @@ export default function ImageSection({
       </div>
 
       {/* Onda inferior (opcional) */}
-      {bottomWave && (
+      {/* {bottomWave && (
         <div className="absolute bottom-0 left-0 w-full overflow-hidden z-10 h-16">
           <svg
             className="absolute w-full"
@@ -112,7 +112,7 @@ export default function ImageSection({
             ></path>
           </svg>
         </div>
-      )}
+      )} */}
     </section>
   );
 }
