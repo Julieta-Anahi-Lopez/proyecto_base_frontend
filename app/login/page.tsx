@@ -21,7 +21,7 @@ export default function Login() {
   // Redirigir si ya está autenticado
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/');
+      router.push('/catalogo');
     }
     
     // Limpiar errores al montar el componente
@@ -45,8 +45,8 @@ export default function Login() {
         
         // Esperar un momento antes de redirigir
         setTimeout(() => {
-          console.log("Redirigiendo a home...");
-          router.push('/');
+          console.log("Redirigiendo a catalogo...");
+          router.push('/catalogo');
         }, 500);
       }
     } catch (err) {
