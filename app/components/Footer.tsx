@@ -55,7 +55,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li><Link href="/politica-privacidad" className="hover:underline">Política de privacidad</Link></li>
               <li><Link href="/terminos" className="hover:underline">Términos y condiciones</Link></li>
-              <li><Link href="/defensa-consumidor" className="hover:underline">Defensa al consumidor</Link></li>
+              <li><Link href="https://autogestion.produccion.gob.ar/consumidores"  target="_blank" className="hover:underline">Defensa al consumidor</Link></li>
             </ul>
           </div>
         </div>
