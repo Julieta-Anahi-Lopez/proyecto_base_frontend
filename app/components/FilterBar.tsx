@@ -48,7 +48,7 @@ export default function FilterBar({ marcas }: FilterBarProps) {
   const labelClass = "text-sm text-blue-800 font-medium";
 
   return (
-    <div className="bg-gray-50 p-4 border-b border-gray-200 shadow-sm">
+    <div className="bg-gray-50 p-4 border-b border-gray-200 shadow-sm pt-32">
       <div className="container max-w-screen-xl mx-auto">
         <div className="flex flex-col md:flex-row items-center gap-3 flex-wrap">
           {/* Código */}

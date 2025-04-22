@@ -94,7 +94,7 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
   };
 
   return (
-    <header className="bg-blue-900 shadow-md relative z-50">
+    <header className="fixed top-0 left-0 w-full bg-blue-900 shadow-md z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         {/* Sección de logos */}
         <div className="flex items-center gap-6">

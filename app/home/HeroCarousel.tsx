@@ -26,7 +26,7 @@ const carouselSlides = [
 
 export default function HeroCarousel() {
   return (
-    <section className="w-full max-w-screen-2xl mx-auto px-4 py-6">
+    <section className="w-full max-w-screen-2xl mx-auto px-4 py-6 bg-gray-50">
       <Carousel slides={carouselSlides} autoPlayInterval={6000} />
     </section>
   );

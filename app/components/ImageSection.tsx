@@ -31,7 +31,7 @@ export default function ImageSection({
   buttonLink
 }: ImageSectionProps) {
   return (
-    <section className="relative w-full">
+    <section className="relative w-full bg-gray-50">
       {/* Onda superior (opcional) */}
       {/* {topWave && (
         <div className="absolute top-0 left-0 w-full overflow-hidden z-10 h-16">
@@ -66,7 +66,7 @@ export default function ImageSection({
       {/* Contenedor dividido en pantallas grandes */}
       <div className={`hidden lg:flex flex-row ${imageOnRight ? '' : 'flex-row-reverse'} ${height}`}>
         {/* Sección de texto */}
-        <div className="w-1/2 bg-white p-12 flex flex-col justify-center">
+        <div className="w-1/2 bg-gray-50 p-12 flex flex-col justify-center">
           <h2 className="text-3xl font-bold text-gray-800 mb-4">{title}</h2>
           <p className="text-gray-600 mb-6">{description}</p>
           
@@ -83,16 +83,24 @@ export default function ImageSection({
         </div>
         
         {/* Sección de imagen */}
-        <div className="w-1/2 relative">
-          <Image
-            src={imageSrc}
-            alt={imageAlt}
-            fill
-            className="object-cover"
-            sizes="50vw"
-            priority
-          />
-        </div>
+        <div
+        className="w-1/2 relative overflow-hidden"
+        style={{
+          clipPath: imageOnRight
+            ? 'polygon(0 0, 100% 0, 100% 100%, 10% 100%)'
+            : 'polygon(0 0, 100% 0, 90% 100%, 0% 100%)',
+        }}
+      >
+        <Image
+          src={imageSrc}
+          alt={imageAlt}
+          fill
+          className="object-cover transition-transform duration-700 scale-[1.02] hover:scale-105"
+          sizes="50vw"
+          priority
+        />
+      </div>
+
       </div>
 
       {/* Onda inferior (opcional) */}

@@ -52,7 +52,7 @@ export default function Carousel({ slides, autoPlayInterval = 5000 }: CarouselPr
 
   return (
     <div 
-      className="relative w-full h-[500px] overflow-hidden rounded-lg shadow-xl" 
+      className="relative w-full h-[500px] overflow-hidden rounded-lg bg-gray-50" 
       onMouseEnter={handlePause}
       onMouseLeave={handleResume}
     >
