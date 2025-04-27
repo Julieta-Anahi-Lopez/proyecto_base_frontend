@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { PasswordField } from '../components/PasswordField';
 
 // Interfaz para los datos del formulario de registro
 interface RegisterFormData {
@@ -158,7 +159,7 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
             name="nombre"
             value={formData.nombre}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700"
             required
           />
         </div>
@@ -174,7 +175,7 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
             name="e_mail"
             value={formData.e_mail}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700"
             required
           />
         </div>
@@ -190,7 +191,7 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
             name="nrodoc"
             value={formData.nrodoc}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700"
             required
           />
         </div>
@@ -206,12 +207,21 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
             name="telcel"
             value={formData.telcel}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700"
           />
         </div>
         
         {/* Contraseña */}
-        <div>
+        <PasswordField
+          id="clave"
+          name="clave"
+          value={formData.clave}
+          onChange={handleChange}
+          label="Contraseña"
+          required={true}
+          helperText="Mínimo 8 caracteres, incluyendo mayúsculas, minúsculas y números"
+        />
+        {/* <div>
           <label htmlFor="clave" className="block text-sm font-medium text-gray-700 mb-1">
             Contraseña *
           </label>
@@ -221,16 +231,25 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
             name="clave"
             value={formData.clave}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700"
             required
           />
           <p className="text-xs text-gray-500 mt-1">
             Mínimo 8 caracteres, incluyendo mayúsculas, minúsculas y números
           </p>
-        </div>
+        </div> */}
         
         {/* Confirmar Contraseña */}
-        <div>
+        <PasswordField
+          id="claveConfirm"
+          name="claveConfirm"
+          value={formData.claveConfirm}
+          onChange={handleChange}
+          label="Confirmar Contraseña"
+          required={true}
+        />
+        
+        {/* <div>
           <label htmlFor="claveConfirm" className="block text-sm font-medium text-gray-700 mb-1">
             Confirmar Contraseña *
           </label>
@@ -240,10 +259,10 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
             name="claveConfirm"
             value={formData.claveConfirm}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700"
             required
           />
-        </div>
+        </div> */}
         
         {/* Botones de acción */}
         <div className="flex space-x-4 pt-2">

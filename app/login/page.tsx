@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { loginUser, clearError } from '../../redux/slices/authSlice';
 import RegisterForm from '../components/RegisterForm';
 import Image from 'next/image';
+import { PasswordField } from '../components/PasswordField';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -120,7 +121,16 @@ export default function Login() {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-                <div>
+                <PasswordField
+                    id="password" // o el nombre que uses para la contraseña en el login
+                    name="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    label="Contraseña"
+                    required={true}
+                    />
+/>
+                {/* <div>
                   <label htmlFor="password" className="sr-only">
                     Contraseña
                   </label>
@@ -135,7 +145,7 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                </div>
+                </div> */}
               </div>
 
               <div>
