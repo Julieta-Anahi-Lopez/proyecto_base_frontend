@@ -362,7 +362,7 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
   
       {/* Menú desplegable en móvil */}
       {isMenuOpen && (
-        <div className="absolute top-full left-0 w-full bg-blue-600 shadow-md py-4 flex flex-col items-center space-y-4 text-white text-lg lg:hidden">
+        <div className="absolute top-full left-0 w-full bg-blue-900 shadow-md py-4 flex flex-col items-center space-y-4 text-white text-lg lg:hidden">
           <Link href="/" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Inicio</Link>
           <Link href="/catalogo" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Catálogo</Link>
           <Link href="/contacto" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Contacto</Link>
