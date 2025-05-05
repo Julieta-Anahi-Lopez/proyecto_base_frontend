@@ -133,7 +133,7 @@ export default function Login() {
                     label="Contraseña"
                     required={true}
                     />
-/>
+
                 {/* <div>
                   <label htmlFor="password" className="sr-only">
                     Contraseña

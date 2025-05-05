@@ -19,6 +19,8 @@ export default function ProductCard({ product }: ProductProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch(); // Inicializamos Redux
 
+  const [showToast, setShowToast] = useState(false);
+
   function normalizeText(text: string) {
     if (!text) return "";
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -35,6 +37,13 @@ export default function ProductCard({ product }: ProductProps) {
       image: productImage, // Aseguramos que la imagen se pase correctamente
     };
     dispatch(addToCart(item));
+      // Mostrar toast
+    setShowToast(true);
+    
+    // Ocultar toast después de 2 segundos
+    setTimeout(() => {
+      setShowToast(false);
+    }, 1000);
   };
 
   return (
@@ -96,6 +105,15 @@ export default function ProductCard({ product }: ProductProps) {
           />
         </div>
       </Modal>
+      {/* Toast notification */}
+      {showToast && (
+        <div className="fixed bottom-4 right-4 bg-gray-800 text-white py-2 px-4 rounded-md shadow-lg transition-opacity duration-300 flex items-center space-x-2 z-50">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+          <p>Producto agregado al carrito</p>
+        </div>
+      )}
     </>
   );
 }
