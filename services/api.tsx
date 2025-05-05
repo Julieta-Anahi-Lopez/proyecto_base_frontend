@@ -56,6 +56,8 @@ const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
+
+      console.log('🔴 Sesión expirada o inválida. Redirigiendo a login...');
       
       store.dispatch(logout());
       

@@ -111,10 +111,13 @@ const authSlice = createSlice({
     },
     restoreAuth: (state) => {
       console.log("Ejecutando restoreAuth, estado actual:", state);
-      
+
       if (typeof window !== 'undefined') {
         const token = localStorage.getItem('auth_token');
         const userString = localStorage.getItem('user');
+
+        console.log("TOKEN EN RESTORE AUTH: ", token);
+        console.log("USER EN RESTORE AUTH: ", userString);
         
         console.log("Valores en localStorage:", { 
           tokenExists: !!token, 

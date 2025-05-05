@@ -19,6 +19,8 @@ export default function Login() {
   const isAuthenticated = auth.isAuthenticated;
   const router = useRouter();
 
+
+
   // Redirigir si ya está autenticado
   useEffect(() => {
     if (isAuthenticated) {
@@ -105,9 +107,11 @@ export default function Login() {
             
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               <div className="rounded-md shadow-sm -space-y-px">
+
+                
                 <div>
-                  <label htmlFor="email" className="sr-only">
-                    Email
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email *
                   </label>
                   <input
                     id="email"
@@ -115,7 +119,7 @@ export default function Login() {
                     type="email"
                     autoComplete="email"
                     required
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

@@ -188,17 +188,51 @@ useEffect(() => {
     console.log("LocalStorageToken: ", localStorageToken)
     
     // Confiamos en que el token es válido si existe
-    store.dispatch(restoreAuth());
-    setAuthChecked(true);
-    setHasLocalStorageAuth(true);
+    const effectiveToken = localStorageToken;
+    console.log("Token efectivo: ", effectiveToken)
+    
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/articulos/`, {
+      headers: {
+        'Authorization': `Bearer ${effectiveToken}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        console.log("Token inválido o expirado, redirigiendo a login");
+        // Eliminar el token inválido
+        localStorage.removeItem('auth_token');
+        // Redireccionar al login
+        router.push('/login');
+        return null; // No continuamos procesando
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data) { // Solo si tenemos datos (la respuesta fue ok)
+        setAuthChecked(true);
+        setHasLocalStorageAuth(true);
+      }
+    })
+    .catch(error => {
+      console.log("Error en la verificación de autenticación:", error);
+      // Redireccionar al login sin mostrar errores al usuario
+      localStorage.removeItem('auth_token');
+      router.push('/login');
+    });
     return;
+  } else {
+    console.log("No hay token en localStorage");
+    // Si no hay token en Redux ni en localStorage, redirigir a login
+    console.log("No hay token válido, redirigiendo a login");
+    router.push('/login');
   }
   
-  // Si no hay token ni en Redux ni en localStorage, redirigir a login
-  console.log("No hay token válido, redirigiendo a login");
-  router.push('/login');
-  
-}, [isAuthenticated, token, authChecked, router]);
+  // Si no hay token, marcar como verificado pero sin autenticación
+  setAuthChecked(true);
+  // Opcional: redirigir al login si se requiere autenticación
+  // router.push('/login');
+}, [authChecked, isAuthenticated, token, router]);
 
 
  // useEffect(() => {
