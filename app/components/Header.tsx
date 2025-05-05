@@ -3,13 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation"; // Importamos usePathname
+import { usePathname } from "next/navigation";
 import { Menu, X, ShoppingCart, User, LogIn, Minus, Plus, Trash2 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
-import CartModal from "./cartModal"; // Importamos el nuevo componente modal
-
+import CartModal from "./cartModal";
 // Interfaces para pedidos
 interface PedidoDetalle {
   compro: string;
@@ -60,6 +59,8 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartPreviewOpen, setIsCartPreviewOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false); // Nuevo estado para modal completo
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
     // Obtener la ruta actual
   const pathname = usePathname();
   const isCatalogPage = pathname === '/catalogo' || pathname === '/productos';
@@ -73,6 +74,35 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
   // Usar el selector memoizado
   const cartItems = useSelector(getCartItems);
   const cartCount = cartItems.reduce((total, item) => total + item.cantidad, 0);
+
+
+  // Verificar autenticación cuando el componente se monta
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        // Si hay token, consideramos que está logueado
+        setIsLoggedIn(true);
+        
+        // Obtener el nombre del usuario del localStorage si lo guardaste ahí
+        const userData = localStorage.getItem('user');
+        //Obtengo el nombre del diccionario almacenado en user
+        const storedUserName = userData ? JSON.parse(userData).nombre : "";
+
+        setUserName(storedUserName || "Usuario");
+      } else {
+        setIsLoggedIn(false);
+        setUserName("");
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
+
+
+
+
 
   // Función para manejar la vista previa del carrito con delay
   let hideTimeout: NodeJS.Timeout;
@@ -108,7 +138,7 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
               className="object-contain"
             />
           </Link>
-
+  
           {/* Logo Walker + Representante Oficial (centrado verticalmente) */}
           <div className="hidden lg:flex flex-col items-center">
             <Image
@@ -122,163 +152,214 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
             <span className="text-white text-sm font-semibold">Representante Oficial Walker</span>
           </div>
         </div>
-
+  
         {/* Menú de navegación (pantallas grandes) */}
         <nav className="hidden lg:flex space-x-6 text-white text-lg items-center">
           <Link href="/" className="hover:text-gray-300">Inicio</Link>
           <Link href="/catalogo" className="hover:text-gray-300">Catálogo</Link>
           <Link href="/contacto" className="hover:text-gray-300">Contacto</Link>
           
-
-          {/* Ícono del carrito con vista previa mejorada */}
-          <div
-            className="relative"
-            onMouseOver={showCartPreview}
-            onMouseLeave={hideCartPreview}
-          >
-            <button className="relative flex items-center" onClick={openCartModal}>
-              <ShoppingCart className="w-6 h-6 text-white hover:text-gray-300" />
+          {/* Botón de inicio de sesión / usuario */}
+          {isLoggedIn ? (
+            <div className="flex items-center">
+              <User size={18} className="mr-1" />
+              <span className="text-white">Hola, {userName}!</span>
+            </div>
+          ) : (
+            <Link 
+              href="/login" 
+              className="flex items-center hover:text-gray-300"
+            >
+              <LogIn size={18} className="mr-1" />
+              <span>Iniciar sesión</span>
+            </Link>
+          )}
+  
+          {/* Ícono del carrito solo si está logueado */}
+          {isLoggedIn && (
+            <div
+              className="relative"
+              onMouseOver={showCartPreview}
+              onMouseLeave={hideCartPreview}
+            >
+              <button className="relative flex items-center" onClick={openCartModal}>
+                <ShoppingCart className="w-6 h-6 text-white hover:text-gray-300" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 rounded-full">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+  
+              {/* Vista previa del carrito */}
+              {isCartPreviewOpen && (
+                <div
+                  className="absolute right-0 mt-2 w-120 bg-white shadow-lg p-4 rounded-md"
+                  style={{ width: "480px", maxWidth: "calc(100vw - 40px)" }}
+                  onMouseOver={showCartPreview}
+                  onMouseLeave={hideCartPreview}
+                >
+                  {cartItems.length === 0 ? (
+                    <div className="text-center">
+                      <p className="text-gray-500 text-sm">El carrito está vacío</p>
+                      <button 
+                        onClick={openCartModal} 
+                        className="text-blue-600 text-sm mt-2 hover:underline"
+                      >
+                        Ver mis pedidos anteriores
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <h3 className="font-semibold text-gray-800 mb-3 border-b pb-2">Productos en el carrito</h3>
+                      <ul className="space-y-3 max-h-60 overflow-y-auto">
+                        {cartItems.map((item) => {
+                          const subtotal = item.precio * item.cantidad;
+                          return (
+                            <li key={item.codigo} className="flex items-center gap-4 border-b pb-3">
+                              {/* Imagen del producto */}
+                              <div className="flex-shrink-0">
+                                <Image 
+                                  src={item.image} 
+                                  alt={item.nombre} 
+                                  width={50} 
+                                  height={50} 
+                                  className="rounded object-cover"
+                                />
+                              </div>
+                              
+                              {/* Información del producto */}
+                              <div className="flex-grow min-w-0">
+                                <p className="text-sm font-medium text-gray-800 truncate max-w-full">
+                                  {item.nombre}
+                                </p>
+                                <div className="flex justify-between mt-1">
+                                  <div className="flex items-center border rounded-md">
+                                  <button
+                                      onClick={() => {
+                                        if (item.cantidad > 1) {
+                                          // Si hay más de 1 unidad, reducimos la cantidad en 1
+                                          dispatch(removeFromCart(item.codigo, false));
+                                        } else {
+                                          // Si solo hay 1 unidad, eliminamos el producto completamente
+                                          dispatch(removeFromCart(item.codigo, true));
+                                        }
+                                      }}
+                                      className="px-2 py-1 text-blue-600 hover:bg-blue-50"
+                                    >
+                                      <Minus size={14} />
+                                    </button>
+                                    <span className="px-2 text-sm font-medium">{item.cantidad}</span>
+                                    <button 
+                                      onClick={() => dispatch(addToCart(item))} 
+                                      className="px-2 py-1 text-blue-600 hover:bg-blue-50"
+                                    >
+                                      <Plus size={14} />
+                                    </button>
+                                  </div>
+                                    <button
+                                    onClick={() => {
+                                      // Aquí se elimina completamente el producto
+                                      dispatch(removeFromCart(item.codigo, true))
+                                    }}
+                                    className="text-red-500 hover:text-red-700"
+                                    >
+                                    <Trash2 size={16} />
+                                    </button>
+                                </div>
+                              </div>
+                              
+                              {/* Precio y subtotal */}
+                              <div className="text-right flex-shrink-0">
+                                <p className="text-xs text-gray-500">
+                                  ${item.precio.toFixed(2)} x {item.cantidad}
+                                </p>
+                                <p className="text-sm font-semibold text-blue-600">
+                                  ${subtotal.toFixed(2)}
+                                </p>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      
+                      {/* Total del carrito */}
+                      <div className="mt-3 pt-2 border-t flex justify-between">
+                        <span className="font-medium">Total:</span>
+                        <span className="font-bold text-blue-700">
+                          ${cartItems.reduce((total, item) => total + (item.precio * item.cantidad), 0).toFixed(2)}
+                        </span>
+                      </div>
+                      
+                      {/* Botones para ir al carrito o ver pedidos */}
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          onClick={openCartModal}
+                          className="flex-1 text-center bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                          Ver Carrito
+                        </button>
+                        <button
+                          onClick={() => {
+                            openCartModal();
+                            // Cuando integremos el componente, utilizaremos esta función para cambiar a la pestaña de pedidos
+                          }}
+                          className="flex-1 text-center bg-gray-100 text-gray-800 py-2 rounded-md hover:bg-gray-200 transition-colors"
+                        >
+                          Mis Pedidos
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </nav>
+  
+        {/* Botón de Menú en móvil */}
+        <div className="lg:hidden flex items-center space-x-4">
+          {/* Botón de inicio de sesión en móvil */}
+          {isLoggedIn ? (
+            <div className="text-white text-sm flex items-center">
+              <User size={16} className="mr-1" />
+              <span className="truncate max-w-[80px]">{userName}</span>
+            </div>
+          ) : (
+            <Link 
+              href="/login" 
+              className="text-white flex items-center"
+            >
+              <LogIn size={16} className="mr-1" />
+              <span className="text-sm">Iniciar</span>
+            </Link>
+          )}
+          
+          {/* Icono de carrito en móvil solo si está logueado */}
+          {isLoggedIn && (
+            <button 
+              className="text-white relative" 
+              onClick={openCartModal}
+            >
+              <ShoppingCart size={20} />
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 rounded-full">
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
             </button>
-
-            {/* Vista previa del carrito */}
-            {isCartPreviewOpen && (
-              <div
-              className="absolute right-0 mt-2 w-120 bg-white shadow-lg p-4 rounded-md"
-              style={{ width: "480px", maxWidth: "calc(100vw - 40px)" }}
-              onMouseOver={showCartPreview}
-              onMouseLeave={hideCartPreview}
-            >
-                {cartItems.length === 0 ? (
-                  <div className="text-center">
-                    <p className="text-gray-500 text-sm">El carrito está vacío</p>
-                    <button 
-                      onClick={openCartModal} 
-                      className="text-blue-600 text-sm mt-2 hover:underline"
-                    >
-                      Ver mis pedidos anteriores
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <h3 className="font-semibold text-gray-800 mb-3 border-b pb-2">Productos en el carrito</h3>
-                    <ul className="space-y-3 max-h-60 overflow-y-auto">
-                      {cartItems.map((item) => {
-                        const subtotal = item.precio * item.cantidad;
-                        return (
-                          <li key={item.codigo} className="flex items-center gap-4 border-b pb-3">
-                            {/* Imagen del producto */}
-                            <div className="flex-shrink-0">
-                              <Image 
-                                src={item.image} 
-                                alt={item.nombre} 
-                                width={50} 
-                                height={50} 
-                                className="rounded object-cover"
-                              />
-                            </div>
-                            
-                            {/* Información del producto */}
-                            <div className="flex-grow min-w-0">
-                              <p className="text-sm font-medium text-gray-800 truncate max-w-full">
-                                {item.nombre}
-                              </p>
-                              <div className="flex justify-between mt-1">
-                                <div className="flex items-center border rounded-md">
-                                <button
-                                    onClick={() => {
-                                      if (item.cantidad > 1) {
-                                        // Si hay más de 1 unidad, reducimos la cantidad en 1
-                                        dispatch(removeFromCart(item.codigo, false));
-                                      } else {
-                                        // Si solo hay 1 unidad, eliminamos el producto completamente
-                                        dispatch(removeFromCart(item.codigo, true));
-                                      }
-                                    }}
-                                    className="px-2 py-1 text-blue-600 hover:bg-blue-50"
-                                  >
-                                    <Minus size={14} />
-                                  </button>
-                                  <span className="px-2 text-sm font-medium">{item.cantidad}</span>
-                                  <button 
-                                    onClick={() => dispatch(addToCart(item))} 
-                                    className="px-2 py-1 text-blue-600 hover:bg-blue-50"
-                                  >
-                                    <Plus size={14} />
-                                  </button>
-                                </div>
-                                  <button
-                                  onClick={() => {
-                                    // Aquí se elimina completamente el producto
-                                    dispatch(removeFromCart(item.codigo, true))
-                                  }}
-                                  className="text-red-500 hover:text-red-700"
-                                  >
-                                  <Trash2 size={16} />
-                                  </button>
-                              </div>
-                            </div>
-                            
-                            {/* Precio y subtotal */}
-                            <div className="text-right flex-shrink-0">
-                              <p className="text-xs text-gray-500">
-                                ${item.precio.toFixed(2)} x {item.cantidad}
-                              </p>
-                              <p className="text-sm font-semibold text-blue-600">
-                                ${subtotal.toFixed(2)}
-                              </p>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    
-                    {/* Total del carrito */}
-                    <div className="mt-3 pt-2 border-t flex justify-between">
-                      <span className="font-medium">Total:</span>
-                      <span className="font-bold text-blue-700">
-                        ${cartItems.reduce((total, item) => total + (item.precio * item.cantidad), 0).toFixed(2)}
-                      </span>
-                    </div>
-                    
-                    {/* Botones para ir al carrito o ver pedidos */}
-                    <div className="flex gap-2 mt-3">
-                      <button
-                        onClick={openCartModal}
-                        className="flex-1 text-center bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
-                      >
-                        Ver Carrito
-                      </button>
-                      <button
-                        onClick={() => {
-                          openCartModal();
-                          // Cuando integremos el componente, utilizaremos esta función para cambiar a la pestaña de pedidos
-                        }}
-                        className="flex-1 text-center bg-gray-100 text-gray-800 py-2 rounded-md hover:bg-gray-200 transition-colors"
-                      >
-                        Mis Pedidos
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        </nav>
-
-        {/* Botón de Menú en móvil */}
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="lg:hidden text-white text-2xl"
-        >
-          {isMenuOpen ? <X /> : <Menu />}
-        </button>
+          )}
+          
+          {/* Botón de hamburguesa */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-white"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
-
+  
       {/* Menú desplegable en móvil */}
       {isMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-blue-600 shadow-md py-4 flex flex-col items-center space-y-4 text-white text-lg lg:hidden">
@@ -286,40 +367,55 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
           <Link href="/catalogo" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Catálogo</Link>
           <Link href="/contacto" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Contacto</Link>
           
-          {/* Añadir enlace al carrito en el menú móvil */}
-          <button 
-            className="hover:text-gray-300 flex items-center gap-2" 
-            onClick={() => {
-              setIsMenuOpen(false);
-              openCartModal();
-            }}
-          >
-            <ShoppingCart size={18} />
-            <span>Carrito</span>
-            {cartCount > 0 && (
-              <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                {cartCount}
-              </span>
-            )}
-          </button>
+          {/* Si no está logueado, mostrar opción de login
+          {!isLoggedIn && (
+            <Link 
+              href="/login" 
+              className="hover:text-gray-300 flex items-center gap-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <LogIn size={18} />
+              <span>Iniciar sesión</span>
+            </Link>
+          )} */}
+          
+          {/* Opción de carrito solo si está logueado */}
+          {/* {isLoggedIn && (
+            <button 
+              className="hover:text-gray-300 flex items-center gap-2" 
+              onClick={() => {
+                setIsMenuOpen(false);
+                openCartModal();
+              }}
+            >
+              <ShoppingCart size={18} />
+              <span>Carrito</span>
+              {cartCount > 0 && (
+                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          )} */}
         </div>
       )}
-
-      {/* Modal completo del carrito */}
-      <CartModal 
-        isOpen={isCartModalOpen} 
-        onClose={() => setIsCartModalOpen(false)} 
-        pedidos={pedidos} 
-        pedidosLoading={pedidosLoading}
-        onSubmitOrder={async (observaciones) => {
-          // Si no se proporciona la función onSubmitOrder, devolvemos false
-          if (!onSubmitOrder) {
-            console.error("La función onSubmitOrder no ha sido proporcionada al Header");
-            return false;
-          }
-          return await onSubmitOrder(observaciones);
-        }}
-      />
+  
+      {/* Modal completo del carrito (solo visible si está logueado) */}
+      {isLoggedIn && (
+        <CartModal 
+          isOpen={isCartModalOpen} 
+          onClose={() => setIsCartModalOpen(false)} 
+          pedidos={pedidos} 
+          pedidosLoading={pedidosLoading}
+          onSubmitOrder={async (observaciones) => {
+            if (!onSubmitOrder) {
+              console.error("La función onSubmitOrder no ha sido proporcionada al Header");
+              return false;
+            }
+            return await onSubmitOrder(observaciones);
+          }}
+        />
+      )}
     </header>
   );
 }
