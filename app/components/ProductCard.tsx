@@ -10,7 +10,7 @@ interface ProductProps {
     codigo: string;
     nombre: string;
     observ: string;
-    precio: number;
+    publico: number;
     imagenes: { foto_1: string }[];
   };
 }
@@ -20,6 +20,22 @@ export default function ProductCard({ product }: ProductProps) {
   const dispatch = useDispatch(); // Inicializamos Redux
 
   const [showToast, setShowToast] = useState(false);
+
+  // Función para formatear precios con separador de miles y coma decimal
+// Función para formatear precios con punto como separador de miles y coma decimal
+function formatPrice(price: number): string {
+  // Convertir a string con 2 decimales fijos
+  const fixed = price.toFixed(2);
+  
+  // Separar parte entera y decimal
+  const [intPart, decPart] = fixed.split('.');
+  
+  // Formatear parte entera con puntos cada 3 dígitos
+  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  
+  // Unir con coma decimal
+  return `${formattedInt},${decPart}`;
+}
 
   function normalizeText(text: string) {
     if (!text) return "";
@@ -33,7 +49,7 @@ export default function ProductCard({ product }: ProductProps) {
     const item = {
       codigo: product.codigo,
       nombre: product.nombre,
-      precio: product.precio,
+      precio: product.publico,
       image: productImage, // Aseguramos que la imagen se pase correctamente
     };
     dispatch(addToCart(item));
@@ -72,7 +88,7 @@ export default function ProductCard({ product }: ProductProps) {
 
     {/* Precio bien integrado */}
     <div className="flex justify-end">
-      <span className="text-base font-semibold text-gray-900">${product.precio.toFixed(2)}</span>
+      <span className="text-base font-semibold text-gray-900">${formatPrice(product.publico)}</span>
     </div>
 
     {/* Acciones */}
