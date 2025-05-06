@@ -230,20 +230,20 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                 
                 {/* Resumen del pedido */}
                 <div className="lg:w-1/3 bg-gray-50 rounded-lg p-4">
-                  <h3 className="font-bold text-lg mb-4 pb-2 border-b">Resumen del pedido</h3>
+                  <h3 className="font-bold text-gray-900 text-lg mb-4 pb-2 border-b">Resumen del pedido</h3>
                   
                   <div className="space-y-3 mb-4">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Subtotal</span>
-                      <span>${cartTotal.toFixed(2)}</span>
+                      <span className="text-gray-700">Subtotal</span>
+                      <span className="text-gray-700">${cartTotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Envío</span>
+                      <span className="text-gray-900">Envío</span>
                       <span className="text-blue-600">A calcular</span>
                     </div>
                     <div className="pt-2 border-t flex justify-between font-bold">
-                      <span>Total</span>
-                      <span>${cartTotal.toFixed(2)}</span>
+                      <span className="text-gray-700">Total</span>
+                      <span className="text-gray-900">${cartTotal.toFixed(2)}</span>
                     </div>
                   </div>
                   
@@ -254,7 +254,7 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                     </label>
                     <textarea
                       id="observaciones"
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border text-gray-900 border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={3}
                       placeholder="Agregar instrucciones especiales o comentarios sobre el pedido..."
                       value={observaciones}
@@ -371,7 +371,7 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                       {/* Total y observaciones */}
                       <div className="mt-3 pt-2 border-t">
                         {pedido.observ && pedido.observ !== "Sin observaciones" && (
-                          <p className="text-sm text-gray-600 mb-2">
+                          <p className="text-sm text-gray-900 mb-2">
                             <span className="font-medium">Observaciones:</span> {pedido.observ}
                           </p>
                         )}
