@@ -157,7 +157,7 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
         <nav className="hidden lg:flex space-x-6 text-white text-lg items-center">
           <Link href="/" className="hover:text-gray-300">Inicio</Link>
           <Link href="/catalogo" className="hover:text-gray-300">Catálogo</Link>
-          <Link href="/contacto" className="hover:text-gray-300">Contacto</Link>
+          {/* <Link href="/contacto" className="hover:text-gray-300">Contacto</Link> */}
           
           {/* Botón de inicio de sesión / usuario */}
           {isLoggedIn ? (
@@ -365,7 +365,7 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
         <div className="absolute top-full left-0 w-full bg-blue-900 shadow-md py-4 flex flex-col items-center space-y-4 text-white text-lg lg:hidden">
           <Link href="/" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Inicio</Link>
           <Link href="/catalogo" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Catálogo</Link>
-          <Link href="/contacto" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Contacto</Link>
+          {/* <Link href="/contacto" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Contacto</Link> */}
           
           {/* Si no está logueado, mostrar opción de login
           {!isLoggedIn && (
