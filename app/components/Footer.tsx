@@ -65,10 +65,10 @@ export default function Footer() {
           <Link href="https://wa.me/5492914732827" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition">
             <MessageCircle size={24} />
           </Link>
-          <Link href="https://instagram.com/klinner" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition">
+          <Link href="https://www.instagram.com/klinner.com.ar" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition">
             <Instagram size={24} />
           </Link>
-          <Link href="https://facebook.com/klinner" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition">
+          <Link href="https://www.facebook.com/klinner.com.ar" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition">
             <Facebook size={24} />
           </Link>
         </div>

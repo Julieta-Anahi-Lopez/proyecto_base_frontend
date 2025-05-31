@@ -17,7 +17,7 @@ export default function PoliticaPrivacidad() {
             los servicios. Por eso se requiere que éstos sean verdaderos y exactos.
           </p>
           <p>
-            La información personal que los Usuarios ingresan en este Sitio Web es totalmente confidencial y [NOMBRE REAL EMPRESA]
+            La información personal que los Usuarios ingresan en este Sitio Web es totalmente confidencial y HORIZONTE SUR S.R.L
             hará su mejor esfuerzo para proteger la privacidad de los mismos, de conformidad con lo dispuesto en la Ley 25.326.
           </p>
           <p>
@@ -27,18 +27,18 @@ export default function PoliticaPrivacidad() {
           </p>
           <p>
             En caso de que los datos sean requeridos por la vía legal, administrativa o judicial correspondiente,
-            [NOMBRE REAL EMPRESA] se verá compelida a revelar los mismos a la autoridad solicitante. En la medida en que la legislación
+            HORIZONTE SUR S.R.L se verá compelida a revelar los mismos a la autoridad solicitante. En la medida en que la legislación
             lo permita, se informará a los Usuarios sobre estos requerimientos.
           </p>
           <p>
-            Por el sólo hecho de registrarse en este Sitio Web, los Usuarios aceptan que [NOMBRE REAL EMPRESA] tiene derecho a comunicarse
+            Por el sólo hecho de registrarse en este Sitio Web, los Usuarios aceptan que HORIZONTE SUR S.R.L tiene derecho a comunicarse
             con ellos por vía postal, telefónica o electrónica y enviar información que considere de su interés. Los Usuarios
             podrán optar por no recibir estas comunicaciones.
           </p>
   
           <h2 className="text-2xl font-semibold mt-8">Información técnica sobre dispositivos</h2>
           <p>
-            Si usted accede al Sitio Web de [NOMBRE REAL EMPRESA] a través de un dispositivo móvil, la información recogida también incluirá
+            Si usted accede al Sitio Web de HORIZONTE SUR S.R.L a través de un dispositivo móvil, la información recogida también incluirá
             el identificador único del dispositivo, ubicación geográfica y otros datos similares, cuando esté permitido.
           </p>
           <p>
