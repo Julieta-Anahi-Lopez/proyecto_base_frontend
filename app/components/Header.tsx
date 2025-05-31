@@ -7,9 +7,11 @@ import { usePathname } from "next/navigation";
 import { Menu, X, ShoppingCart, User, LogIn, Minus, Plus, Trash2 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
-import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
+import { addToCart, removeFromCart, clearCart } from "@/redux/slices/cartSlice";
 import CartModal from "./cartModal";
 import { useAuth } from "../../app/lib/hooks/useAuth";
+import { useRouter } from "next/navigation"; // si aún no lo tenés
+
 
 
 // Interfaces para pedidos
@@ -53,20 +55,24 @@ interface HeaderProps {
   pedidos?: Pedido[];
   pedidosLoading?: boolean;
   onSubmitOrder?: (observaciones: string) => Promise<boolean>;
+  onLogoutRefresh?: () => void;
 }
 
 // Mover el selector fuera del componente
 const getCartItems = (state: RootState) => state.cart.items;
 
-export default function Header({ pedidos = [], pedidosLoading = false, onSubmitOrder }: HeaderProps) {
+export default function Header({ pedidos = [], pedidosLoading = false, onSubmitOrder, onLogoutRefresh }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [isCartPreviewOpen, setIsCartPreviewOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false); // Nuevo estado para modal completo
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
     // Obtener la ruta actual
   const pathname = usePathname();
   const isCatalogPage = pathname === '/catalogo' || pathname === '/productos';
 
+  const router = useRouter();
+  const [showLogoutToast, setShowLogoutToast] = useState(false);
 
 
 
@@ -76,6 +82,15 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
   // Usar el selector memoizado
   const cartItems = useSelector(getCartItems);
   const cartCount = cartItems.reduce((total, item) => total + item.cantidad, 0);
+
+  const handleLogout = () => {
+    logout();
+    dispatch(clearCart());
+    setShowLogoutToast(true);
+    onLogoutRefresh?.();   // ✅ Fuerza reload de productos
+    setTimeout(() => setShowLogoutToast(false), 4000);
+    
+  };
 
 
   // Función para manejar la vista previa del carrito con delay
@@ -133,21 +148,41 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
           <Link href="/catalogo" className="hover:text-gray-300">Catálogo</Link>
           {/* <Link href="/contacto" className="hover:text-gray-300">Contacto</Link> */}
           
-          {/* Botón de inicio de sesión / usuario */}
           {isAuthenticated ? (
-              <div className="flex items-center">
-                <User size={18} className="mr-1" />
-                <span className="text-white">Hola, {user?.nombre ?? "Usuario"}!</span>
-              </div>
-            ) : (
-            <Link 
-              href="/login" 
-              className="flex items-center hover:text-gray-300"
-            >
-              <LogIn size={18} className="mr-1" />
-              <span>Iniciar sesión</span>
-            </Link>
-          )}
+  <div className="relative">
+    <button
+      onClick={() => setShowUserMenu((prev) => !prev)}
+      className="flex items-center text-white hover:text-gray-300 focus:outline-none"
+    >
+      <User size={18} className="mr-1" />
+      <span>Hola, {user?.nombre ?? "Usuario"}!</span>
+    </button>
+
+    {showUserMenu && (
+      <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded-md shadow-lg py-2 z-50">
+        {/* Futuras opciones aquí */}
+        <button
+  onClick={() => {
+    handleLogout();       // ✅ llama logout + muestra el toast
+    setShowUserMenu(false);
+  }}
+  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+>
+  Cerrar sesión
+</button>
+      </div>
+    )}
+  </div>
+) : (
+  <Link 
+    href="/login" 
+    className="flex items-center hover:text-gray-300"
+  >
+    <LogIn size={18} className="mr-1" />
+    <span>Iniciar sesión</span>
+  </Link>
+)}
+
   
           {/* Ícono del carrito solo si está logueado */}
           {isAuthenticated  && (
@@ -390,6 +425,13 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
           }}
         />
       )}
+
+
+    {showLogoutToast && (
+      <div className="fixed bottom-6 right-6 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-[999] transition-opacity duration-500 opacity-100">
+        Cerraste sesión correctamente.
+      </div>
+    )}
     </header>
   );
 }

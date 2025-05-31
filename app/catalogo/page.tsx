@@ -112,6 +112,8 @@ export default function CatalogoPage() {
   const [orderError, setOrderError] = useState<string | null>(null);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState<boolean | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
 
 
   useEffect(() => {
@@ -159,11 +161,11 @@ export default function CatalogoPage() {
   // Cargar productos según filtros
   useEffect(() => {
     if (!authChecked) return;
-
+  
     const loadProducts = async () => {
       try {
         setLoading(true);
-
+  
         const params = new URLSearchParams();
         if (filters.category) params.append("nrogru", filters.category);
         if (filters.subcategory) params.append("subrubro", filters.subcategory);
@@ -171,14 +173,14 @@ export default function CatalogoPage() {
         if (filters.nromar) params.append("nromar", filters.nromar);
         if (filters.codigo) params.append("codigo", filters.codigo);
         if (filters.nombre) params.append("nombre", filters.nombre);
-
+  
         const url = `${process.env.NEXT_PUBLIC_API_URL}/articulos/?${params.toString()}`;
-
+  
         const headers = {
           ...(token && { Authorization: `Bearer ${token}` }),
           "Content-Type": "application/json",
         };
-
+  
         const res = await fetch(url, { headers });
         const data = await res.json();
         setProducts(data);
@@ -188,10 +190,10 @@ export default function CatalogoPage() {
         setLoading(false);
       }
     };
-
+  
     loadProducts();
-  }, [authChecked, filters, token]);
-
+  }, [authChecked, isAuthenticated, filters, token, refreshKey]);
+  
   // Cargar pedidos solo si está autenticado
   useEffect(() => {
     if (!authChecked || !isAuthenticated) return;
@@ -300,6 +302,7 @@ export default function CatalogoPage() {
         pedidos={isAuthenticated ? pedidos : []}
         pedidosLoading={isAuthenticated && pedidosLoading}
         onSubmitOrder={isAuthenticated ? handleSubmitOrder : undefined}
+        onLogoutRefresh={() => setRefreshKey(prev => prev + 1)} // 👈 fuerza reload
       />
       
       <FilterBar marcas={marcas} />

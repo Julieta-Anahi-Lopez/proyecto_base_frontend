@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 interface User {
   nombre: string;
-  [key: string]: any; // permite más campos sin romper el tipado
+  [key: string]: any;
 }
 
 export function useAuth() {
@@ -33,10 +33,20 @@ export function useAuth() {
     setAuthChecked(true);
   }, []);
 
+  const logout = () => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("refresh_token")
+    localStorage.removeItem("user");
+    setToken(null);
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
   return {
     token,
     user,
     isAuthenticated,
     authChecked,
+    logout, // ✅ ahora sí exportado correctamente
   };
 }
