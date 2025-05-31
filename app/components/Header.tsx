@@ -9,6 +9,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
 import CartModal from "./cartModal";
+import { useAuth } from "../../app/lib/hooks/useAuth";
+
+
 // Interfaces para pedidos
 interface PedidoDetalle {
   compro: string;
@@ -59,8 +62,7 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartPreviewOpen, setIsCartPreviewOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false); // Nuevo estado para modal completo
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
+  const { isAuthenticated, user } = useAuth();
     // Obtener la ruta actual
   const pathname = usePathname();
   const isCatalogPage = pathname === '/catalogo' || pathname === '/productos';
@@ -74,34 +76,6 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
   // Usar el selector memoizado
   const cartItems = useSelector(getCartItems);
   const cartCount = cartItems.reduce((total, item) => total + item.cantidad, 0);
-
-
-  // Verificar autenticación cuando el componente se monta
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('auth_token');
-      if (token) {
-        // Si hay token, consideramos que está logueado
-        setIsLoggedIn(true);
-        
-        // Obtener el nombre del usuario del localStorage si lo guardaste ahí
-        const userData = localStorage.getItem('user');
-        //Obtengo el nombre del diccionario almacenado en user
-        const storedUserName = userData ? JSON.parse(userData).nombre : "";
-
-        setUserName(storedUserName || "Usuario");
-      } else {
-        setIsLoggedIn(false);
-        setUserName("");
-      }
-    };
-    
-    checkAuth();
-  }, []);
-
-
-
-
 
 
   // Función para manejar la vista previa del carrito con delay
@@ -160,12 +134,12 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
           {/* <Link href="/contacto" className="hover:text-gray-300">Contacto</Link> */}
           
           {/* Botón de inicio de sesión / usuario */}
-          {isLoggedIn ? (
-            <div className="flex items-center">
-              <User size={18} className="mr-1" />
-              <span className="text-white">Hola, {userName}!</span>
-            </div>
-          ) : (
+          {isAuthenticated ? (
+              <div className="flex items-center">
+                <User size={18} className="mr-1" />
+                <span className="text-white">Hola, {user?.nombre ?? "Usuario"}!</span>
+              </div>
+            ) : (
             <Link 
               href="/login" 
               className="flex items-center hover:text-gray-300"
@@ -176,7 +150,7 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
           )}
   
           {/* Ícono del carrito solo si está logueado */}
-          {isLoggedIn && (
+          {isAuthenticated  && (
             <div
               className="relative"
               onMouseOver={showCartPreview}
@@ -320,10 +294,10 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
         {/* Botón de Menú en móvil */}
         <div className="lg:hidden flex items-center space-x-4">
           {/* Botón de inicio de sesión en móvil */}
-          {isLoggedIn ? (
-            <div className="text-white text-sm flex items-center">
-              <User size={16} className="mr-1" />
-              <span className="truncate max-w-[80px]">{userName}</span>
+          {isAuthenticated ? (
+            <div className="flex items-center">
+              <User size={18} className="mr-1" />
+              <span className="text-white">Hola, {user?.nombre ?? "Usuario"}!</span>
             </div>
           ) : (
             <Link 
@@ -336,7 +310,7 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
           )}
           
           {/* Icono de carrito en móvil solo si está logueado */}
-          {isLoggedIn && (
+          {isAuthenticated  && (
             <button 
               className="text-white relative" 
               onClick={openCartModal}
@@ -401,7 +375,7 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
       )}
   
       {/* Modal completo del carrito (solo visible si está logueado) */}
-      {isLoggedIn && (
+      {isAuthenticated  && (
         <CartModal 
           isOpen={isCartModalOpen} 
           onClose={() => setIsCartModalOpen(false)} 

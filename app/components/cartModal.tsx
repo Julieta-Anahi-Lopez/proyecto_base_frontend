@@ -8,6 +8,7 @@ import { Minus, Plus, Trash2, ShoppingCart, Package2 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { addToCart, removeFromCart, clearCart } from "@/redux/slices/cartSlice";
+import { useAuth } from "../../app/lib/hooks/useAuth";
 
 // Interfaces para pedidos
 interface PedidoDetalle {
@@ -59,7 +60,10 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const dispatch = useDispatch();
-  
+  const { isAuthenticated } = useAuth();
+
+
+
   // Obtener items del carrito desde Redux
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const cartTotal = cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
@@ -274,11 +278,16 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                       isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'
                     }`}
                     onClick={async () => {
+                      if (!isAuthenticated) {
+                        setSubmitError("Debes iniciar sesión para enviar un pedido.");
+                        return;
+                      }
+                    
                       if (isSubmitting || cartItems.length === 0) return;
-                      
+                    
                       setIsSubmitting(true);
                       setSubmitError(null);
-                      
+                    
                       try {
                         const success = await onSubmitOrder(observaciones);
                         if (success) {
@@ -293,6 +302,7 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                         setIsSubmitting(false);
                       }
                     }}
+                    
                     disabled={isSubmitting || cartItems.length === 0}
                   >
                     {isSubmitting ? (

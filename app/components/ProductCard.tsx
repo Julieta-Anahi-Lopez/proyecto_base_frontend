@@ -44,23 +44,21 @@ function formatPrice(price: number): string {
 
   const productImage = product.imagenes?.[0]?.foto_1 || "/Caja.webp";
 
-  // Función para agregar el producto al carrito
-  const handleAddToCart = () => {
-    const item = {
-      codigo: product.codigo,
-      nombre: product.nombre,
-      precio: product.publico,
-      image: productImage, // Aseguramos que la imagen se pase correctamente
-    };
-    dispatch(addToCart(item));
-      // Mostrar toast
-    setShowToast(true);
-    
-    // Ocultar toast después de 2 segundos
-    setTimeout(() => {
-      setShowToast(false);
-    }, 1000);
+const handleAddToCart = () => {
+  if (typeof product.publico !== "number") return;
+
+  const item = {
+    codigo: product.codigo,
+    nombre: product.nombre,
+    precio: product.publico,
+    image: productImage,
+    cantidad: 1, // ✅ ¡Esta es la propiedad que faltaba!
   };
+  
+  dispatch(addToCart(item));
+  setShowToast(true);
+  setTimeout(() => setShowToast(false), 1000);
+};
 
   return (
     <>
@@ -87,10 +85,13 @@ function formatPrice(price: number): string {
     </div>
 
     {/* Precio bien integrado */}
-    <div className="flex justify-end">
-      <span className="text-base font-semibold text-gray-900">${formatPrice(product.publico)}</span>
-    </div>
-
+    {typeof product.publico === "number" && (
+      <div className="flex justify-end">
+        <span className="text-base font-semibold text-gray-900">
+          ${formatPrice(product.publico)}
+        </span>
+      </div>
+    )}
     {/* Acciones */}
     <div className="mt-auto flex gap-2">
       <button
