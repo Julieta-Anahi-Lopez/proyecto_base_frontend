@@ -40,11 +40,6 @@ export default function CatalogoPage() {
     }
   }, []);
 
-
-
-
-
-
   const router = useRouter();
   // const cartItems = useSelector(getCartItems);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -106,7 +101,7 @@ export default function CatalogoPage() {
       />
       <div style={{ height: headerHeight }} />
 
-    <main className="flex-grow flex flex-col">
+      <main className="flex-grow flex flex-col bg-gray-50">
       <FiltersPanel rubros={rubros} marcas={marcas} onChange={setFilters} />
       <div className="flex-grow">
         {loading ? (
