@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect, forwardRef  } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -11,6 +11,7 @@ import { addToCart, removeFromCart, clearCart } from "@/redux/slices/cartSlice";
 import CartModal from "./cartModal";
 import { useAuth } from "../../app/lib/hooks/useAuth";
 import { useRouter } from "next/navigation"; // si aún no lo tenés
+
 
 
 
@@ -61,7 +62,11 @@ interface HeaderProps {
 // Mover el selector fuera del componente
 const getCartItems = (state: RootState) => state.cart.items;
 
-export default function Header({ pedidos = [], pedidosLoading = false, onSubmitOrder, onLogoutRefresh }: HeaderProps) {
+const Header = forwardRef<HTMLDivElement, HeaderProps>(function Header(
+  { pedidos = [], pedidosLoading = false, onSubmitOrder, onLogoutRefresh },
+  ref
+) {
+  const headerRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isCartPreviewOpen, setIsCartPreviewOpen] = useState(false);
@@ -113,7 +118,10 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-blue-900 shadow-md z-50">
+    <header
+    ref={ref}
+    className="fixed top-0 left-0 w-full bg-blue-900 shadow-md z-50"
+  >
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         {/* Sección de logos */}
         <div className="flex items-center gap-6">
@@ -432,10 +440,9 @@ export default function Header({ pedidos = [], pedidosLoading = false, onSubmitO
         Cerraste sesión correctamente.
       </div>
     )}
-    </header>
+      </header>
   );
-}
+});
 
-
-
+export default Header;
 
