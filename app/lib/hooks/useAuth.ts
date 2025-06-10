@@ -33,20 +33,28 @@ export function useAuth() {
     setAuthChecked(true);
   }, []);
 
-  const logout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("refresh_token")
-    localStorage.removeItem("user");
-    setToken(null);
-    setUser(null);
-    setIsAuthenticated(false);
-  };
+  // const logout = () => {
+  //   localStorage.removeItem("auth_token");
+  //   localStorage.removeItem("refresh_token")
+  //   localStorage.removeItem("user");
+  //   setToken(null);
+  //   setUser(null);
+  //   setIsAuthenticated(false);
+  // };
 
   return {
     token,
     user,
     isAuthenticated,
     authChecked,
-    logout, // ✅ ahora sí exportado correctamente
+    logout: logoutGlobal // ✅ ahora sí exportado correctamente
   };
+}
+
+
+// lib/hooks/useAuth.ts
+export function logoutGlobal() {
+  localStorage.removeItem("auth_token");
+  localStorage.removeItem("refresh_token");
+  localStorage.removeItem("user");
 }

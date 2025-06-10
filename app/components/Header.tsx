@@ -87,7 +87,6 @@ const Header = forwardRef<HTMLDivElement, HeaderProps>(function Header(
   // Usar el selector memoizado
   const cartItems = useSelector(getCartItems);
   const cartCount = cartItems.reduce((total, item) => total + item.cantidad, 0);
-
   const handleLogout = () => {
     logout();
     dispatch(clearCart());

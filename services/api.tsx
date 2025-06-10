@@ -1,13 +1,9 @@
-//services/api.tsx
-import { store } from '../store'; // Asegúrate que esta ruta sea correcta
-import { logout } from '../redux/slices/authSlice';
-import { useRouter } from 'next/router';
+// services/api.ts
+import { logoutGlobal } from '@/app/lib/hooks/useAuth';
 
-
-const router = useRouter();
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-// Helper para construir query strings
+// 🔧 Función auxiliar para construir query strings
 const buildQueryString = (params: Record<string, any>) => {
   const filteredParams = Object.entries(params).reduce((acc, [key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
@@ -15,28 +11,29 @@ const buildQueryString = (params: Record<string, any>) => {
     }
     return acc;
   }, {} as Record<string, string>);
-  
+
   const queryString = new URLSearchParams(filteredParams).toString();
   return queryString ? `?${queryString}` : '';
 };
 
-// Helper para obtener headers con el token actual
+// 🔐 Obtener headers con token actual (si existe)
 const getAuthHeaders = () => {
-  const state = store.getState();
-  const token = state.auth.token;
-  
+  const token = localStorage.getItem('auth_token');
   return {
-    'Authorization': token ? `Bearer ${token}` : '',
+    Authorization: token ? `Bearer ${token}` : '',
     'Content-Type': 'application/json',
   };
 };
 
-// Función genérica para hacer solicitudes API
-const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
-  // Asegúrate de que la URL comience con una barra
+// 🌐 Función genérica para hacer solicitudes a la API
+const fetchApi = async (
+  endpoint: string,
+  options: RequestInit = {},
+  retryWithoutAuth = true // permite retry si es endpoint público
+) => {
   const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const url = `${apiUrl}${normalizedEndpoint}`;
-  
+
   const headers = {
     ...getAuthHeaders(),
     ...options.headers,
@@ -44,43 +41,63 @@ const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
 
   try {
     console.log(`🔵 Haciendo solicitud a: ${url}`);
-    
+
     const response = await fetch(url, {
       ...options,
       headers,
     });
 
-    // Manejar token expirado/inválido
+    // 🧼 Token inválido o vencido
     if (response.status === 401) {
-      // Limpiar la sesión y tokens
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('user');
+      const contentType = response.headers.get("content-type");
 
-      console.log('🔴 Sesión expirada o inválida. Redirigiendo a login...');
-      
-      store.dispatch(logout());
-      
-      // Redirigir a la página de login
-      if (typeof window !== 'undefined') {
-        // Usamos replace en lugar de window.location.href para una mejor experiencia
-        // window.location.replace('/login');
-        router.push('/login');
-        
-        // Detener la ejecución para evitar que se procese más código
-        return new Promise(() => {});
+      let data: any = null;
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text(); // fallback para inspección
+        console.warn("⚠️ Respuesta no JSON recibida:", text);
+        throw new Error("Respuesta inesperada del servidor.");
       }
-      
-      throw new Error('Sesión expirada. Por favor inicie sesión nuevamente.');
+
+      const tokenInvalid =
+        data?.code === 'token_not_valid' ||
+        data?.detail?.includes?.('token') ||
+        data?.messages?.some?.((m: any) => m.message?.includes?.('expired'));
+
+      if (tokenInvalid) {
+        console.warn('⚠️ Token vencido. Limpiando sesión...');
+        logoutGlobal();
+
+        if (retryWithoutAuth) {
+          console.log('🔁 Reintentando sin token...');
+          return fetchApi(endpoint, { ...options, headers: {} }, false);
+        }
+
+        if (typeof window !== 'undefined') {
+          window.location.replace('/login');
+          return new Promise(() => {});
+        }
+
+        throw new Error('Sesión expirada. Por favor inicia sesión.');
+      }
     }
 
-
-    // Para respuestas no-JSON (como 204 No Content)
+    // Sin contenido (204 No Content)
     if (response.status === 204) {
       return null;
     }
 
-    const data = await response.json();
+    const contentType = response.headers.get("content-type");
+
+    let data: any = null;
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const text = await response.text(); // fallback para inspección
+      console.warn("⚠️ Respuesta no JSON recibida:", text);
+      throw new Error("Respuesta inesperada del servidor.");
+    }
 
     if (!response.ok) {
       console.log(`🔴 Error en respuesta: ${response.status}`, data);
@@ -90,44 +107,55 @@ const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
     console.log(`🟢 Respuesta exitosa de: ${url.split('?')[0]}`);
     return data;
   } catch (error) {
-    console.error('Error en la solicitud API:', error);
+    console.error('❌ Error en la solicitud API:', error);
     throw error;
   }
 };
 
-// API Service object
+// ✅ API Service público
 export const apiService = {
-  // Métodos HTTP generales
+  // Métodos HTTP genéricos
   get: (endpoint: string) => fetchApi(endpoint, { method: 'GET' }),
-  
-  post: (endpoint: string, data: any) => fetchApi(endpoint, { 
-    method: 'POST', 
-    body: JSON.stringify(data) 
-  }),
-  
-  put: (endpoint: string, data: any) => fetchApi(endpoint, { 
-    method: 'PUT', 
-    body: JSON.stringify(data) 
-  }),
-  
+
+  post: (endpoint: string, data: any) =>
+    fetchApi(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  put: (endpoint: string, data: any) =>
+    fetchApi(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
   delete: (endpoint: string) => fetchApi(endpoint, { method: 'DELETE' }),
-  
-  // Métodos específicos para endpoints de tu API
+
+  // Métodos específicos para tu API
   getProducts: (filters = {}) => {
     const queryString = buildQueryString(filters);
-    return fetchApi(`/articulos${queryString}`);
+    return fetchApi(`/articulos${queryString}`, {}, true); // ✅ público
   },
-  
-  getCategories: () => fetchApi('/categorias/'),
-  
+
+  getCategories: () => fetchApi('/categorias/', {}, true),
+
   getSubcategories: (categoryId?: string) => {
     const query = categoryId ? `?nrogru=${categoryId}` : '';
-    return fetchApi(`/subcategorias${query}`);
+    return fetchApi(`/subcategorias${query}`, {}, true);
   },
-  
-  // Método existente
-  createPedido: (pedidoData: any) => fetchApi('/pedidos/', {
-    method: 'POST',
-    body: JSON.stringify(pedidoData)
-  }),
+
+  getMarcas: () => fetchApi("/tipo-marcas/", {}, true),
+
+  getRubros: () => fetchApi("/tipo-rubros-con-subrubros", {}, true),
+
+  createPedido: (pedidoData: any) =>
+    fetchApi('/pedidos/', {
+      method: 'POST',
+      body: JSON.stringify(pedidoData),
+    }, false), // 🔒 privado: no reintenta sin token
+
+  getPedidosCliente: () => fetchApi("/pedidos/usuario/mis-pedidos/", {}, false),
+
 };
+
+

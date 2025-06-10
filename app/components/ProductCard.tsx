@@ -15,13 +15,14 @@ interface ProductProps {
     cantidad: number;
     imagenes: { foto_1: string }[];
   };
+  isAuthenticated: boolean;
 }
 
-export default function ProductCard({ product }: ProductProps) {
+export default function ProductCard({ product, isAuthenticated }: ProductProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const dispatch = useDispatch();
-  const { isAuthenticated } = useAuth();
+  // const { isAuthenticated } = useAuth();
 
   const fallbackImage = "/Caja.webp";
   const originalImage = product.imagenes?.[0]?.foto_1;
@@ -39,13 +40,14 @@ export default function ProductCard({ product }: ProductProps) {
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
+      console.warn("🚫 Usuario no autenticado, no se puede agregar.");
       setShowToast(true);
       setTimeout(() => setShowToast(false), 2500);
       return;
     }
-
+  
     if (typeof product.publico !== "number") return;
-
+  
     const item = {
       codigo: product.codigo,
       nombre: product.nombre,
@@ -53,11 +55,12 @@ export default function ProductCard({ product }: ProductProps) {
       image: imageSrc,
       cantidad: 1,
     };
-
+  
     dispatch(addToCart(item));
-    setShowToast(true);
+    // setShowToast(true);
     setTimeout(() => setShowToast(false), 1500);
   };
+  
 
   function normalizeText(text: string) {
     if (!text) return "";
