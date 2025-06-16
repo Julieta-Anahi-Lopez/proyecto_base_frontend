@@ -148,11 +148,13 @@ export const apiService = {
 
   getRubros: () => fetchApi("/tipo-rubros-con-subrubros", {}, true),
 
-  createPedido: (pedidoData: any) =>
-    fetchApi('/pedidos/', {
+  createPedido: async (pedidoData: any) => {
+    console.log("📤 Enviando pedido:", pedidoData);
+    return fetchApi('/pedidos/', {
       method: 'POST',
-      body: JSON.stringify(pedidoData),
-    }, false), // 🔒 privado: no reintenta sin token
+      body: JSON.stringify(pedidoData)
+    });
+  }, // 🔒 privado: no reintenta sin token
 
   getPedidosCliente: () => fetchApi("/pedidos/usuario/mis-pedidos/", {}, false),
 

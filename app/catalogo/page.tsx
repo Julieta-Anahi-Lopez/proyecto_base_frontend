@@ -117,12 +117,33 @@ export default function CatalogoPage() {
   }, [authChecked, isAuthenticated]);
   
 
+  const handleSubmitOrder = async (observaciones: string): Promise<boolean> => {
+    try {
+      const payload = {
+        observ: observaciones,
+        detalles: cartItems.map(item => ({
+          codart: item.codigo,
+          cantid: item.cantidad,
+          precio: item.precio,
+        })),
+      };
+  
+      const response = await apiService.createPedido(payload);
+  
+      return !!response; // devuelve true si responde ok
+    } catch (error) {
+      console.error("❌ Error enviando pedido:", error);
+      return false;
+    }
+  };
+  
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header
         pedidos={isAuthenticated ? pedidos : []}
         pedidosLoading={false}
-        onSubmitOrder={() => {}}
+        onSubmitOrder={handleSubmitOrder}
         onLogoutRefresh={() => setRefreshKey((prev) => prev + 1)}
         ref={headerRef}
       />
