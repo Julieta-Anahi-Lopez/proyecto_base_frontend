@@ -51,7 +51,10 @@ interface CartModalProps {
   onClose: () => void;
   pedidos: Pedido[];
   pedidosLoading: boolean;
-  onSubmitOrder: (observaciones: string) => Promise<boolean>;
+  onSubmitOrder: (
+    observaciones: string,
+    items: { codigo: string; cantidad: number; precio: number }[]
+  ) => Promise<boolean>;
 }
 
 export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoading = false, onSubmitOrder }: CartModalProps) {
@@ -289,7 +292,13 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                       setSubmitError(null);
                     
                       try {
-                        const success = await onSubmitOrder(observaciones);
+                        const simplifiedItems = cartItems.map(({ codigo, cantidad, precio }) => ({
+                          codigo,
+                          cantidad,
+                          precio,
+                        }));
+                        
+                        const success = await onSubmitOrder(observaciones, simplifiedItems);
                         if (success) {
                           dispatch(clearCart());
                           setObservaciones("");

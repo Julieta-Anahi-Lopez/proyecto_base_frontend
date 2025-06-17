@@ -117,20 +117,22 @@ export default function CatalogoPage() {
   }, [authChecked, isAuthenticated]);
   
 
-  const handleSubmitOrder = async (observaciones: string): Promise<boolean> => {
+  const handleSubmitOrder = async (
+    observaciones: string,
+    items: { codigo: string; cantidad: number; precio: number }[]
+  ): Promise<boolean> => {
     try {
       const payload = {
-        observ: observaciones,
-        detalles: cartItems.map(item => ({
-          codart: item.codigo,
-          cantid: item.cantidad,
+        observ: observaciones.trim() || "Sin observaciones",
+        detalle: items.map(item => ({
+          codigo: item.codigo,
+          cantidad: item.cantidad,
           precio: item.precio,
         })),
       };
   
       const response = await apiService.createPedido(payload);
-  
-      return !!response; // devuelve true si responde ok
+      return !!response;
     } catch (error) {
       console.error("❌ Error enviando pedido:", error);
       return false;

@@ -428,7 +428,7 @@ const Header = forwardRef<HTMLDivElement, HeaderProps>(function Header(
               console.error("La función onSubmitOrder no ha sido proporcionada al Header");
               return false;
             }
-            return await onSubmitOrder(observaciones);
+            return await onSubmitOrder(observaciones, cartItems);
           }}
         />
       )}
