@@ -160,7 +160,7 @@ export default function FiltersPanel({ rubros, marcas, onChange }: Props) {
                       ? (e) => handleCategoryClick(e.target.value)
                       : handleChange
                   }
-                  className="h-7 px-2 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                  className="h-7 px-2 text-sm border text-gray-700 bg-white border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Todas</option>
                   {options.map((opt) => (
