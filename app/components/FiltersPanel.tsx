@@ -1,8 +1,8 @@
 "use client";
+import { useEffect, useState } from "react";
+import { Filter, XCircle } from "lucide-react";
 import { Rubro, Marca } from "@/types";
 import { useFilters } from "../lib/hooks/useFilters";
-import { useState } from "react";
-import { Filter } from "lucide-react";
 
 interface Props {
   rubros: Rubro[];
@@ -14,6 +14,18 @@ export default function FiltersPanel({ rubros, marcas, onChange }: Props) {
   const { filters, updateFilter, setCategory, clearFilters } = useFilters();
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [localFilters, setLocalFilters] = useState({ ...filters });
+
+  // Detectar si está en mobile
+  const isMobile = () =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 639px)").matches;
+
+  // Inicialización responsive
+  useEffect(() => {
+    if (!isMobile()) {
+      setIsCollapsed(false);
+    }
+  }, []);
 
   const handleCategoryClick = (category: string, subcategory?: string) => {
     setLocalFilters((prev) => ({
@@ -60,136 +72,131 @@ export default function FiltersPanel({ rubros, marcas, onChange }: Props) {
     onChange(resetFilters);
   };
 
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
+
   return (
-    <div className="w-full border-b border-gray-300 shadow-sm bg-white sticky top-[115px] z-40">
+    <div className="w-full bg-white sticky top-[115px] z-40 border-b border-gray-200 shadow-sm">
       {/* Toggle en mobile */}
-      <div className="sm:hidden sticky top-[90px] z-30 bg-white px-4 py-2 border-b border-gray-200 shadow">
+      <div className="sm:hidden sticky top-[90px] z-30 bg-white px-4 py-2 border-b border-gray-200 shadow flex justify-between items-center">
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="flex items-center justify-center w-10 h-10 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
+          className="relative flex items-center justify-center w-9 h-9 rounded bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
           aria-label="Alternar filtros"
         >
-          <Filter
-            size={20}
-            className={`transition-transform duration-300 ${
-              !isCollapsed ? "rotate-90" : ""
-            }`}
-          />
+          <Filter size={18} className={`transition-transform ${!isCollapsed ? "rotate-90" : ""}`} />
+          {activeFilterCount > 0 && (
+            <span className="absolute top-[-5px] right-[-5px] bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+              {activeFilterCount}
+            </span>
+          )}
         </button>
       </div>
   
-      <div className="max-w-screen-xl mx-auto px-4 py-4">
-        <div className={`${isCollapsed ? "hidden sm:grid" : "grid"} grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3`}>
-          {/* Marca */}
-          <div className="flex flex-col">
-            <label className="text-xs font-medium text-gray-700">Marca</label>
-            <select
-              name="nromar"
-              value={localFilters.nromar || ""}
-              onChange={handleChange}
-              className="text-xs border border-gray-300 text-gray-700 rounded-md px-2 h-8 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Todas</option>
-              {marcas.map((marca) => (
-                <option key={marca.codigo} value={marca.codigo}>
-                  {marca.nombre}
-                </option>
-              ))}
-            </select>
-          </div>
-  
-          {/* Código */}
-          <div className="flex flex-col">
-            <label className="text-xs font-medium text-gray-700">Código</label>
-            <input
-              name="codigo"
-              value={localFilters.codigo || ""}
-              onChange={handleChange}
-              className="text-xs border border-gray-300 text-gray-700 rounded-md px-2 h-8 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-  
-          {/* Nombre */}
-          <div className="flex flex-col">
-            <label className="text-xs font-medium text-gray-700">Nombre</label>
-            <input
-              name="nombre"
-              value={localFilters.nombre || ""}
-              onChange={handleChange}
-              className="text-xs border border-gray-300 text-gray-700 rounded-md px-2 h-8 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-  
-          {/* Categoría */}
-          <div className="flex flex-col">
-            <label className="text-xs font-medium text-gray-700">Categoría</label>
-            <select
-              name="category"
-              value={localFilters.category || ""}
-              onChange={(e) => handleCategoryClick(e.target.value)}
-              className="text-xs border border-gray-300 text-gray-700 rounded-md px-2 h-8 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Todas</option>
-              {rubros.map((rubro) => (
-                <option key={rubro.codigo} value={rubro.codigo}>
-                  {rubro.nombre}
-                </option>
-              ))}
-            </select>
-          </div>
-  
-          {/* Subcategoría */}
-          <div className="flex flex-col">
-            <label className="text-xs font-medium text-gray-700">Subcategoría</label>
-            <select
-              name="subcategory"
-              value={localFilters.subcategory || ""}
-              onChange={handleChange}
-              className="text-xs border border-gray-300 text-gray-700 rounded-md px-2 h-8 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Todas</option>
-              {rubros
-                .find((r) => r.codigo.toString() === localFilters.category)
-                ?.subrubros.map((sub) => (
-                  <option key={sub.codigo} value={sub.codigo}>
-                    {sub.nombre}
-                  </option>
-                ))}
-            </select>
-          </div>
-  
-          {/* Precio máx */}
-          <div className="flex flex-col">
-            <label className="text-xs font-medium text-gray-700">Precio máx.</label>
-            <input
-              type="number"
-              min={0}
-              name="precio_max"
-              value={localFilters.precio_max || ""}
-              onChange={handleChange}
-              className="text-xs border border-gray-300 rounded-md px-2 h-8 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Ej: 10000"
-            />
-          </div>
+      {/* Filtros + botones */}
+      <div className="max-w-screen-xl mx-auto px-4 py-2 flex flex-wrap sm:flex-nowrap items-end gap-2">
+        {/* Filtros */}
+        <div className={`${isCollapsed ? "hidden sm:flex" : "flex"} flex-wrap gap-2 grow`}>
+          {[
+            {
+              label: "Marca",
+              name: "nromar",
+              type: "select",
+              className: "min-w-[120px]",
+              options: marcas.map((m) => ({ label: m.nombre, value: m.codigo })),
+            },
+            {
+              label: "Código",
+              name: "codigo",
+              type: "input",
+              className: "w-24",
+            },
+            {
+              label: "Nombre",
+              name: "nombre",
+              type: "input",
+              className: "min-w-[140px]",
+            },
+            {
+              label: "Categoría",
+              name: "category",
+              type: "select",
+              className: "min-w-[140px]",
+              options: rubros.map((r) => ({ label: r.nombre, value: r.codigo })),
+            },
+            {
+              label: "Subcategoría",
+              name: "subcategory",
+              type: "select",
+              className: "min-w-[140px]",
+              options:
+                rubros.find((r) => r.codigo.toString() === localFilters.category)
+                  ?.subrubros.map((s) => ({ label: s.nombre, value: s.codigo })) || [],
+            },
+            {
+              label: "Precio máx.",
+              name: "precio_max",
+              type: "number",
+              className: "w-28",
+              placeholder: "Ej: 10000",
+            },
+          ].map(({ label, name, type, options = [], className = "", placeholder }) => (
+            <div key={name} className={`flex flex-col ${className}`}>
+              <label className="text-xs font-medium text-gray-700">{label}</label>
+              {type === "input" || type === "number" ? (
+                <input
+                  type={type}
+                  name={name}
+                  value={localFilters[name] || ""}
+                  onChange={handleChange}
+                  placeholder={placeholder}
+                  className="h-7 px-2 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                />
+              ) : (
+                <select
+                  name={name}
+                  value={localFilters[name] || ""}
+                  onChange={
+                    name === "category"
+                      ? (e) => handleCategoryClick(e.target.value)
+                      : handleChange
+                  }
+                  className="h-7 px-2 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Todas</option>
+                  {options.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          ))}
         </div>
   
-        {/* Botones en una fila aparte */}
-        <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:justify-end">
-          <button
-            type="button"
-            onClick={handleClearFilters}
-            className="text-xs bg-red-100 text-red-800 px-4 h-8 rounded-md hover:bg-red-200 transition"
-          >
-            Limpiar filtros
-          </button>
-          <button
-            type="button"
-            onClick={applyFilters}
-            className="text-xs bg-blue-100 text-blue-800 px-4 h-8 rounded-md hover:bg-blue-200 transition"
-          >
-            Aplicar filtros
-          </button>
-        </div>
+        {/* Botones */}
+        {(!isCollapsed || !isMobile()) && (
+          <div className="flex gap-2 items-end">
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="h-8 w-8 sm:w-auto sm:px-3 flex items-center justify-center text-red-700 bg-red-100 hover:bg-red-200 rounded transition text-sm"
+              title="Limpiar filtros"
+            >
+              <XCircle className="w-4 h-4 sm:mr-1" />
+              <span className="hidden sm:inline">Limpiar</span>
+            </button>
+            <button
+              type="button"
+              onClick={applyFilters}
+              className="h-8 w-8 sm:w-auto sm:px-3 flex items-center justify-center text-blue-800 bg-blue-100 hover:bg-blue-200 rounded transition text-sm"
+              title="Aplicar filtros"
+            >
+              <Filter className="w-4 h-4 sm:mr-1" />
+              <span className="hidden sm:inline">Aplicar</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
