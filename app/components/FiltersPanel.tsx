@@ -108,13 +108,13 @@ export default function FiltersPanel({ rubros, marcas, onChange }: Props) {
               label: "Código",
               name: "codigo",
               type: "input",
-              className: "w-24",
+              className: "w-24 text-gray-700",
             },
             {
               label: "Nombre",
               name: "nombre",
               type: "input",
-              className: "min-w-[140px]",
+              className: "min-w-[140px] text-gray-700",
             },
             {
               label: "Categoría",
@@ -136,7 +136,7 @@ export default function FiltersPanel({ rubros, marcas, onChange }: Props) {
               label: "Precio máx.",
               name: "precio_max",
               type: "number",
-              className: "w-28",
+              className: "w-28 text-gray-700",
               placeholder: "Ej: 10000",
             },
           ].map(({ label, name, type, options = [], className = "", placeholder }) => (
