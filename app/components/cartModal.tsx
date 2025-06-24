@@ -160,7 +160,7 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">Tu carrito está vacío</h3>
                 <p className="text-gray-500 mb-6">Parece que aún no has agregado productos a tu carrito</p>
                 <Link 
-                  href="/" 
+                  href="/catalogo" 
                   className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors"
                   onClick={onClose}
                 >
