@@ -435,7 +435,7 @@ const Header = forwardRef<HTMLDivElement, HeaderProps>(function Header(
 
 
     {showLogoutToast && (
-      <div className="fixed bottom-8 right-24 bg-emerald-500 text-white px-16 py-3 rounded-lg shadow-lg z-[999] transition-opacity duration-500 opacity-100">
+      <div className="fixed bottom-8 right-24 bg-emerald-500 text-white px-3 py-3 rounded-lg shadow-lg z-[999] transition-opacity duration-500 opacity-100">
         Cerraste sesión correctamente.
       </div>
     )}
