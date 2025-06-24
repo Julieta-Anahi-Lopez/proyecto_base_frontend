@@ -11,8 +11,8 @@ interface ProductProps {
     codigo: string;
     nombre: string;
     observ: string;
-    publico: number;
-    cantidad: number;
+    precio_final: number;
+    stock: number;
     imagenes: { foto_1: string }[];
   };
   isAuthenticated: boolean;
@@ -29,7 +29,7 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
   const [imageSrc, setImageSrc] = useState<string>(originalImage || fallbackImage);
   const [imageKey, setImageKey] = useState<number>(0); // fuerza rerender de <Image>
 
-  const stock = product.cantidad ?? 0;
+  const stock = product.stock ?? 0;
 
   let stockMessage = null;
   if (stock <= 0) {
@@ -46,12 +46,12 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
       return;
     }
   
-    if (typeof product.publico !== "number") return;
+    if (typeof product.precio_final !== "number") return;
   
     const item = {
       codigo: product.codigo,
       nombre: product.nombre,
-      precio: product.publico,
+      precio: product.precio_final,
       image: imageSrc,
       cantidad: 1,
     };
@@ -112,10 +112,10 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
           </div>
 
           {/* Precio */}
-          {typeof product.publico === "number" && (
+          {typeof product.precio_final === "number" && (
             <div className="flex justify-end">
               <span className="text-base font-semibold text-gray-900">
-                ${formatPrice(product.publico)}
+                ${formatPrice(product.precio_final)}
               </span>
             </div>
           )}
