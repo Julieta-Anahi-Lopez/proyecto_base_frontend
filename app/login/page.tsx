@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import Head from 'next/head';
@@ -12,6 +13,9 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showRegister, setShowRegister] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
   const dispatch = useAppDispatch();
   const auth = useAppSelector(state => state.auth || { loading: false, error: null, isAuthenticated: false });
   const loading = auth.loading;
@@ -19,48 +23,36 @@ export default function Login() {
   const isAuthenticated = auth.isAuthenticated;
   const router = useRouter();
 
-
-
-  // Redirigir si ya está autenticado
   useEffect(() => {
     if (isAuthenticated) {
       router.push('/catalogo');
     }
-    
-    // Limpiar errores al montar el componente
+
     return () => {
       dispatch(clearError());
     };
   }, [isAuthenticated, router, dispatch]);
 
-  // Función para manejar el inicio de sesión
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      console.log("Intentando iniciar sesión con:", { email, password: "***" });
       const resultAction = await dispatch(loginUser({ email, clave: password }));
-      
-      console.log("Resultado de la acción:", resultAction);
-      
       if (loginUser.fulfilled.match(resultAction)) {
-        console.log("Login exitoso. Token:", resultAction.payload.token);
-        
-        // Esperar un momento antes de redirigir
-        setTimeout(() => {
-          console.log("Redirigiendo a catalogo...");
-          router.push('/catalogo');
-        }, 500);
+        router.push('/catalogo');
+      } else {
+        setToastMessage(resultAction?.payload?.detail || "No se pudo iniciar sesión");
+        setShowToast(true);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error en login:", err);
+      setToastMessage("Error inesperado al iniciar sesión");
+      setShowToast(true);
     }
   };
 
-  // Alternar entre login y registro
   const toggleRegister = () => {
     setShowRegister(!showRegister);
-    // Limpiar errores al cambiar de formulario
     dispatch(clearError());
   };
 
@@ -70,25 +62,22 @@ export default function Login() {
         <title>{showRegister ? 'Crear Cuenta' : 'Iniciar Sesión'} | Mi E-commerce</title>
       </Head>
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
         <div className="mb-8">
           <Image
             src="/images/logos/400px x 100 px KLINNER - ENCABEZADO - recortada.png"
             alt="Logo Klinner"
             width={220}
             height={110}
-            priority={true}
+            priority
             className="object-contain"
           />
         </div>
-        
+
         {showRegister ? (
-          // Mostrar formulario de registro
           <div className="w-full max-w-md">
             <RegisterForm onCancel={toggleRegister} />
           </div>
         ) : (
-          // Mostrar formulario de inicio de sesión
           <div className="w-full max-w-md space-y-8">
             <div>
               <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
@@ -98,17 +87,9 @@ export default function Login() {
                 Ingresa a tu cuenta para acceder al sistema
               </p>
             </div>
-            
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-                <span className="block sm:inline">{error}</span>
-              </div>
-            )}
-            
-            <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-              <div className="rounded-md shadow-sm -space-y-px">
 
-                
+            <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+              <div className="rounded-md shadow-sm space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                     Email *
@@ -126,30 +107,13 @@ export default function Login() {
                   />
                 </div>
                 <PasswordField
-                    id="password" // o el nombre que uses para la contraseña en el login
-                    name="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    label="Contraseña"
-                    required={true}
-                    />
-
-                {/* <div>
-                  <label htmlFor="password" className="sr-only">
-                    Contraseña
-                  </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                    placeholder="Contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div> */}
+                  id="password"
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  label="Contraseña"
+                  required
+                />
               </div>
 
               <div>
@@ -171,11 +135,10 @@ export default function Login() {
                   )}
                 </button>
               </div>
-              
-              {/* Enlace para registrarse */}
+
               <div className="text-center">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={toggleRegister}
                   className="font-medium text-blue-600 hover:text-blue-500 focus:outline-none"
                 >
@@ -186,6 +149,24 @@ export default function Login() {
           </div>
         )}
       </div>
+
+      {/* Toast emergente */}
+      {showToast && (
+        <div className="fixed bottom-4 right-4 bg-red-600 text-white py-3 px-4 rounded-md shadow-lg transition-opacity duration-300 z-50 w-[95vw] max-w-xl flex flex-wrap sm:flex-nowrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2 flex-1">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0 text-white" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 10A8 8 0 11.999 10 8 8 0 0118 10zM9 5a1 1 0 012 0v4a1 1 0 01-2 0V5zm1 8a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
+            </svg>
+            <p className="text-sm">{toastMessage}</p>
+          </div>
+          <button
+            onClick={() => setShowToast(false)}
+            className="bg-white text-red-600 font-semibold text-sm px-4 py-1.5 rounded-md shadow-sm hover:bg-gray-100 transition w-full sm:w-auto"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
     </>
   );
 }
