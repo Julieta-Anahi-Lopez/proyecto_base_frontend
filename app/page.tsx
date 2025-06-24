@@ -39,7 +39,7 @@ export default function Home() {
                   imageSrc="/images/1200px x 900 px  - IMAGEN CARROUSEL 1.jpg"
                   imageAlt="Productos Klinner para limpieza y cuidado"
                   title="Soluciones profesionales de limpieza"
-                  description="Descubre nuestra línea completa de productos para el cuidado y limpieza de vehículos, con la más alta calidad y resultados profesionales garantizados."
+                  description="Descubrí nuestra línea completa de productos para el cuidado y limpieza de vehículos, con la más alta calidad y resultados profesionales garantizados."
                   imageOnRight={true}
                   buttonText="Ver productos"
                   buttonLink="/catalogo" />

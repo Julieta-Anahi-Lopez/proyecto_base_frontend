@@ -11,6 +11,7 @@ import FiltersPanel from "../components/FiltersPanel";
 import { useAuth } from "@/app/lib/hooks/useAuth";
 import { useFilters, Filters } from "@/app/lib/hooks/useFilters";
 import { apiService } from "@/services/api";
+import WhatsAppButton from "../components/WhatsAppButton";
 
 export default function CatalogoPage() {
   const { token, isAuthenticated, authChecked } = useAuth();
@@ -161,6 +162,10 @@ export default function CatalogoPage() {
           )}
         </div>
       </main>
+      <WhatsAppButton 
+        phoneNumber="+5492914732827"
+        message="Hola, estoy interesado en productos Klinner"
+      />
 
       <Footer />
     </div>
