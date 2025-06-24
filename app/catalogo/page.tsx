@@ -155,11 +155,19 @@ export default function CatalogoPage() {
       <main className="flex-grow flex flex-col bg-gray-50">
         <FiltersPanel rubros={rubros} marcas={marcas} onChange={setFilters} />
         <div className="flex-grow">
-          {loading ? (
-            <div className="p-6">Cargando productos...</div>
-          ) : (
-            <ProductGrid products={products}  isAuthenticated={isAuthenticated} />
-          )}
+        {loading ? (
+  <div className="flex flex-col items-center justify-center py-10 text-blue-700">
+    <div className="flex space-x-2 mb-3">
+      <span className="sr-only">Cargando...</span>
+      <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
+      <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
+      <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" />
+    </div>
+    <span className="text-lg font-medium">Cargando productos...</span>
+  </div>
+) : (
+  <ProductGrid products={products} isAuthenticated={isAuthenticated} />
+)}
         </div>
       </main>
       <WhatsAppButton 
