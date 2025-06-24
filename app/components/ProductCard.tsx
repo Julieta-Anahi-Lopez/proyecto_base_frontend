@@ -28,6 +28,8 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
   const originalImage = product.imagenes?.[0]?.foto_1;
   const [imageSrc, setImageSrc] = useState<string>(originalImage || fallbackImage);
   const [imageKey, setImageKey] = useState<number>(0); // fuerza rerender de <Image>
+  const [cantidad, setCantidad] = useState(1);
+
 
   const stock = product.stock ?? 0;
 
@@ -53,7 +55,7 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
       nombre: product.nombre,
       precio: product.precio_final,
       image: imageSrc,
-      cantidad: 1,
+      cantidad,
     };
   
     dispatch(addToCart(item));
@@ -121,6 +123,27 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
           )}
 
           {/* Acciones */}
+          {isAuthenticated && stock > 0 && (
+            <div className="flex items-center justify-center mb-2 space-x-2">
+                <button
+                  onClick={() => setCantidad((prev) => Math.max(1, prev - 1))}
+                  className="w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition"
+                  disabled={cantidad <= 1}
+                >
+                  −
+                </button>
+                <span className="min-w-[1.5rem] text-center text-sm font-medium text-gray-800">{cantidad}</span>
+                <button
+                  onClick={() => setCantidad((prev) => Math.min(stock, prev + 1))}
+                  className="w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition"
+                  disabled={cantidad >= stock}
+                >
+                  +
+                </button>
+              </div>
+            )}
+
+
           <div className="mt-auto flex gap-2">
             <button
               onClick={() => setIsModalOpen(true)}
