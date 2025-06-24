@@ -86,8 +86,8 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      // hour: '2-digit',
+      // minute: '2-digit',
     });
   };
 
@@ -339,7 +339,7 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                   </button>
                   
                   <p className="text-xs text-gray-500 text-center mt-3">
-                    Al hacer click, enviarás tu pedido a nuestro sistema y te contactaremos para coordinar el envío y pago.
+                    Al hacer click, enviarás tu pedido a nuestro sistema. A continuacion podés realizar el pago y enviar el comprobante por Whatsapp o bien, comunicarte con nosotros para coordinar pago y envío.
                   </p>
                 </div>
               </div>
