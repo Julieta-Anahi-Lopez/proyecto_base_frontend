@@ -172,6 +172,7 @@ const Header = forwardRef<HTMLDivElement, HeaderProps>(function Header(
   onClick={() => {
     handleLogout();       // ✅ llama logout + muestra el toast
     setShowUserMenu(false);
+    router.push('/login'); // ✅ redirige a login
   }}
   className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
 >
