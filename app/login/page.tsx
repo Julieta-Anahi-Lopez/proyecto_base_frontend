@@ -145,10 +145,41 @@ export default function Login() {
                   ¿No tenés cuenta? Registrate!
                 </button>
               </div>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => router.push('/catalogo')}
+                  className="
+                    mt-4 
+                    w-full 
+                    flex 
+                    justify-center 
+                    py-2 
+                    px-4 
+                    border 
+                    border-gray-300 
+                    text-sm 
+                    font-medium 
+                    rounded-md 
+                    text-gray-700 
+                    bg-gray-100 
+                    hover:bg-gray-150 
+                    focus:outline-none 
+                    focus:ring-2 
+                    focus:ring-offset-2 
+                    focus:ring-blue-500
+                  "
+                >
+                  Continuar sin iniciar sesión
+                </button>
+              </div>
+
             </form>
           </div>
         )}
       </div>
+
 
       {/* Toast emergente */}
       {showToast && (
