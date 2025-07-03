@@ -78,7 +78,25 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
 
   return (
     <>
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow duration-300 min-h-[460px]">
+      <div
+  className="
+    bg-white
+    border
+    border-gray-200
+    rounded-lg
+    overflow-hidden
+    flex
+    flex-col
+    shadow-sm
+    hover:shadow-md
+    transition-shadow
+    duration-300
+    min-h-[460px]
+    max-w-[320px]
+    w-full
+    mx-auto
+  "
+>
         {/* Imagen principal */}
         <div className="relative h-64 bg-gray-50 border-b border-gray-200">
           <Image

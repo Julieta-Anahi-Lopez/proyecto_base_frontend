@@ -17,7 +17,7 @@ interface ProductGridProps {
 export default function ProductGrid({ products, isAuthenticated  }: ProductGridProps) {
   return (
     <div className="flex-grow bg-white p-4">
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
+      <div className="grid justify-center grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
         {products.map((product) => (
           <ProductCard key={product.codigo} product={product} isAuthenticated={isAuthenticated} />
         ))}
