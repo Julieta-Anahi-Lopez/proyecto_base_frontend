@@ -13,6 +13,8 @@ import { useFilters, Filters } from "@/app/lib/hooks/useFilters";
 import { apiService } from "@/services/api";
 import WhatsAppButton from "../components/WhatsAppButton";
 import LoginPrompt from "../components/LoginPrompt";
+import { useSearchParams } from "next/navigation";
+
 
 export default function CatalogoPage() {
   const { token, isAuthenticated, authChecked } = useAuth();
@@ -24,6 +26,12 @@ export default function CatalogoPage() {
     codigo: null,
     nombre: null,
   });
+
+
+
+
+
+
 
   const [products, setProducts] = useState<Product[]>([]);
   const [rubros, setRubros] = useState<Rubro[]>([]);
@@ -37,6 +45,24 @@ export default function CatalogoPage() {
 
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
+
+
+  const searchParams = useSearchParams();
+  const nromarFromUrl = searchParams.get("nromar");
+
+  useEffect(() => {
+    if (nromarFromUrl) {
+      setFilters((prev) => ({
+        ...prev,
+        nromar: Number(nromarFromUrl),
+      }));
+    }
+  }, [nromarFromUrl]);
+
+
+
+
+
 
   useLayoutEffect(() => {
     if (headerRef.current) {
