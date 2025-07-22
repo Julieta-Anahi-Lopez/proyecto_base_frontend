@@ -28,7 +28,7 @@ export default function Home() {
                   title="Soluciones profesionales de limpieza"
                   description="Descubre nuestra línea completa de productos para el cuidado y limpieza de vehículos, con la más alta calidad y resultados profesionales garantizados."
                   imageOnRight={false}
-                  buttonText="Ver productos"
+                  buttonText="Ver catálogo"
                   buttonLink="/catalogo" />
         
         {/* Sección de marcas con el mismo tratamiento */}
@@ -41,7 +41,7 @@ export default function Home() {
                   title="Soluciones profesionales de limpieza"
                   description="Descubrí nuestra línea completa de productos para el cuidado y limpieza de vehículos, con la más alta calidad y resultados profesionales garantizados."
                   imageOnRight={true}
-                  buttonText="Ver productos"
+                  buttonText="Ver catálogo"
                   buttonLink="/catalogo" />
       </main>
       <Footer />

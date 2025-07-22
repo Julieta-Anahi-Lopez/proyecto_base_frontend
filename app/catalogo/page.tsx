@@ -12,6 +12,7 @@ import { useAuth } from "@/app/lib/hooks/useAuth";
 import { useFilters, Filters } from "@/app/lib/hooks/useFilters";
 import { apiService } from "@/services/api";
 import WhatsAppButton from "../components/WhatsAppButton";
+import LoginPrompt from "../components/LoginPrompt";
 
 export default function CatalogoPage() {
   const { token, isAuthenticated, authChecked } = useAuth();
@@ -40,7 +41,6 @@ export default function CatalogoPage() {
   useLayoutEffect(() => {
     if (headerRef.current) {
       setHeaderHeight(headerRef.current.offsetHeight);
-      console.log("Algo")
     }
   }, []);
 
@@ -174,6 +174,10 @@ export default function CatalogoPage() {
         phoneNumber="+5492914732827"
         message="Hola, estoy interesado en productos Klinner"
       />
+  
+
+  {!isAuthenticated && authChecked && <LoginPrompt />}
+
 
       <Footer />
     </div>
