@@ -194,7 +194,7 @@ export default function Login() {
                       rounded-md 
                       text-gray-700 
                       bg-gray-100 
-                      hover:bg-gray-150 
+                      hover:bg-gray-150   
                       focus:outline-none 
                       focus:ring-2 
                       focus:ring-offset-2 
