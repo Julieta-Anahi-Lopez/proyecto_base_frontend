@@ -20,9 +20,13 @@ interface ProductProps {
 
 export default function ProductCard({ product, isAuthenticated }: ProductProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showToast, setShowToast] = useState(false);
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'info';
+  }>({ show: false, message: '', type: 'info' });
   const dispatch = useDispatch();
-  // const { isAuthenticated } = useAuth();
+
 
   const fallbackImage = "/Caja.webp";
   const originalImage = product.imagenes?.[0]?.foto_1;
@@ -42,9 +46,13 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
-      console.warn("🚫 Usuario no autenticado, no se puede agregar.");
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 2500);
+      console.warn("🚫 Usuario no autenticado");
+      setToast({
+        show: true,
+        message: "Iniciá sesión para comenzar tu pedido",
+        type: "info",
+      });
+      setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
       return;
     }
   
@@ -59,8 +67,12 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
     };
   
     dispatch(addToCart(item));
-    // setShowToast(true);
-    setTimeout(() => setShowToast(false), 1500);
+    setToast({
+      show: true,
+      message: "Producto agregado al carrito",
+      type: "success",
+    });
+    setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 2000);
   };
   
 
@@ -209,12 +221,18 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
       </Modal>
 
       {/* Toast */}
-      {showToast && (
-        <div className="fixed bottom-4 right-4 bg-blue-600 text-white py-3 px-4 rounded-md shadow-lg transition-opacity duration-300 z-50 w-[95vw] max-w-xl flex flex-wrap sm:flex-nowrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2 flex-1">
+      {toast.show && (
+          <div
+            className={`fixed bottom-20 right-3 sm:right-[88px] py-3 px-3 rounded-md shadow-lg z-50 w-[80vw] max-w-xl flex items-center gap-3 transition-opacity duration-100
+              ${
+                toast.type === 'success'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-blue-600 text-white'
+              }`}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 flex-shrink-0 text-white"
+              className="h-5 w-5 flex-shrink-0"
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -224,16 +242,11 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
                 clipRule="evenodd"
               />
             </svg>
-            <p className="text-sm">Iniciá sesión para comenzar tu pedido</p>
+            <p className="text-sm">{toast.message}</p>
           </div>
-          <button
-            onClick={() => (window.location.href = "/login")}
-            className="bg-white text-blue-600 font-semibold text-sm px-4 py-1.5 rounded-md shadow-sm hover:bg-gray-100 transition w-full sm:w-auto"
-          >
-            Iniciar sesión
-          </button>
-        </div>
-      )}
+        )}
+
+
     </>
   );
 }
