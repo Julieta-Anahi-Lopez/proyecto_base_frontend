@@ -80,6 +80,10 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
   // Si el modal no está abierto, no renderizamos nada
   if (!isOpen) return null;
 
+  const user = typeof window !== "undefined"
+  ? JSON.parse(localStorage.getItem("user") || "{}")
+  : {};
+
   // Formatear fecha de pedido
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -100,7 +104,8 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 p-4 overflow-y-auto">
+      <div className="min-h-full flex items-center justify-center">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6 space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center border-b pb-3">
@@ -271,6 +276,21 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                       value={observaciones}
                       onChange={(e) => setObservaciones(e.target.value)}
                     />
+                  </div>
+                  {/* Info adicional del usuario */}
+                  <div className="mt-4 border-t pt-4 space-y-2 text-sm text-gray-700">
+                    <div>
+                      <span className="font-bold">Dirección:</span>{" "}
+                      {user.domcal || '—'} {user.domnro || '—'}
+                    </div>
+                    <div>
+                      <span className="font-bold">CUIT / DNI:</span>{" "}
+                      {user.cuit && user.cuit !== "Sin cuit" ? user.cuit : user.dni || '—'}
+                    </div>
+                    <div>
+                      <span className="font-bold">Condición IVA:</span>{" "}
+                      {user.catIva || user.cativa || 'Consumidor Final'}
+                    </div>
                   </div>
 
                   {/* Error de envío si existe */}
@@ -490,8 +510,9 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
         </div>
       )}
 
+</div> // cierre de min-h-full flex
+</div> // cierre de fixed inset-0
 
-    </div>
   );
 }
 
