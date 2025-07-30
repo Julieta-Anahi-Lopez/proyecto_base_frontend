@@ -12,6 +12,8 @@ interface RegisterFormData {
   telcel: string;
   nrodoc: string;
   locali: string;
+  domcalle: string;
+  domnro: string;
 }
 // Valores iniciales del formulario
 const initialFormData: RegisterFormData = {
@@ -21,7 +23,9 @@ const initialFormData: RegisterFormData = {
   e_mail: '',
   telcel: '',
   nrodoc: '',
-  locali: ''
+  locali: '',
+  domcalle: '',
+  domnro: ''
 };
 
 export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
@@ -30,6 +34,8 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const [sinNumero, setSinNumero] = useState(false);
+
 
   // Manejar cambios en los campos del formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,6 +83,10 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
     if (!passwordRegex.test(formData.clave)) {
       return 'La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula y un número';
     }
+    // Validar número de domicilio si no es "S/N"
+    if (!sinNumero && (!/^\d+$/.test(formData.domnro) || parseInt(formData.domnro, 10) <= 0)) {
+      return 'El número de domicilio debe ser un número positivo';
+    }
 
     return null;
   };
@@ -105,7 +115,9 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
         gposeg: 0,   // Valor por defecto
         telcel: formData.telcel || "",
         nrodoc: formData.nrodoc,
-        locali: formData.locali
+        locali: formData.locali,
+        domcalle: formData.domcalle,
+        domnro: sinNumero ? "S/N" : formData.domnro,
       };
 
       // Enviar los datos a la API
@@ -201,6 +213,59 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
             required
           />
         </div>
+        {/* Domicilio Calle */}
+        <div>
+          <label htmlFor="domcalle" className="block text-sm font-medium text-gray-700 mb-1">
+            Calle *
+          </label>
+          <input
+            type="text"
+            id="domcalle"
+            name="domcalle"
+            value={formData.domcalle}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700"
+            required
+          />
+        </div>
+
+      {/* Domicilio Número */}
+      <div>
+        <label htmlFor="domnro" className="block text-sm font-medium text-gray-700 mb-1">
+          Número *
+        </label>
+        <input
+          type="text"
+          id="domnro"
+          name="domnro"
+          value={sinNumero ? "S/N" : formData.domnro}
+          onChange={handleChange}
+          disabled={sinNumero}
+          inputMode="numeric"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700 disabled:bg-gray-100"
+          required={!sinNumero}
+        />
+        <div className="mt-1 flex items-center">
+          <input
+            id="sinNumero"
+            name="sinNumero"
+            type="checkbox"
+            checked={sinNumero}
+            onChange={() => {
+              setSinNumero(prev => !prev);
+              setFormData(prev => ({
+                ...prev,
+                domnro: prev.domnro || "S/N"
+              }));
+            }}
+            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+          />
+          <label htmlFor="sinNumero" className="ml-2 block text-sm text-gray-700">
+            Sin número
+          </label>
+        </div>
+      </div>
+
 
         {/* Localidad */}
         <div>
