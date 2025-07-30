@@ -90,27 +90,27 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
 
   return (
     <>
-      <div
-  className="
-    bg-white
-    border
-    border-gray-200
-    rounded-lg
-    overflow-hidden
-    flex
-    flex-col
-    shadow-sm
-    hover:shadow-md
-    transition-shadow
-    duration-300
-    min-h-[460px]
-    max-w-[320px]
-    w-full
-    mx-auto
-  "
->
+        <div
+          className="
+            bg-white
+            border
+            border-gray-200
+            rounded-lg
+            overflow-hidden
+            flex
+            flex-col
+            shadow-sm
+            hover:shadow-md
+            transition-shadow
+            duration-300
+            max-w-[320px]
+            w-full
+            mx-auto
+          "
+        >
         {/* Imagen principal */}
-        <div className="relative h-64 bg-gray-50 border-b border-gray-200">
+        <div className="relative w-full aspect-square bg-gray-50 border-b border-gray-200">
+
           <Image
             key={imageKey}
             src={imageSrc}
@@ -127,7 +127,8 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
         </div>
 
         {/* Contenido */}
-        <div className="flex flex-col justify-between flex-grow p-4 gap-3">
+        <div className="flex flex-col justify-between flex-grow p-3 sm:p-4 gap-2 sm:gap-3">
+
           <div>
             <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
               {normalizeText(product.nombre)}
@@ -194,21 +195,21 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
         title={normalizeText(product.nombre)}
         description={product.observ}
       >
-        <div className="relative h-80 bg-gray-100 mb-4">
-          <Image
-            key={`modal-${imageKey}`}
-            src={imageSrc}
-            alt={product.nombre}
-            fill
-            onError={() => {
-              if (imageSrc !== fallbackImage) {
-                setImageSrc(fallbackImage);
-                setImageKey(prev => prev + 1);
-              }
-            }}
-            className="object-contain p-6"
-          />
-        </div>
+      <div className="relative aspect-[1/1] bg-gray-100 mb-4 rounded">
+        <Image
+          key={`modal-${imageKey}`}
+          src={imageSrc}
+          alt={product.nombre}
+          fill
+          onError={() => {
+            if (imageSrc !== fallbackImage) {
+              setImageSrc(fallbackImage);
+              setImageKey(prev => prev + 1);
+            }
+          }}
+          className="object-contain p-6"
+        />
+      </div>
         {stockMessage && (
           <p
             className={`text-sm font-medium text-center mb-2 ${
