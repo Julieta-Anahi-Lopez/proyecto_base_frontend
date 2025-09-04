@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+
 import { useRouter } from "next/navigation";
 import Head from 'next/head';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
@@ -62,7 +64,7 @@ export default function Login() {
         <title>{showRegister ? 'Crear Cuenta' : 'Iniciar Sesión'} | Mi E-commerce</title>
       </Head>
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
+      <div onClick={() => router.push('/')} className="cursor-pointer">
           <Image
             src="/images/logos/400px x 100 px KLINNER - ENCABEZADO - recortada.png"
             alt="Logo Klinner"
