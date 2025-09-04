@@ -29,4 +29,4 @@ export default function ProductGrid({ products, isAuthenticated  }: ProductGridP
         </div>
       </div>
     </div>
-  );
+  )};

@@ -134,7 +134,7 @@ export const apiService = {
   // Métodos específicos para tu API
   getProducts: (filters = {}) => {
     const queryString = buildQueryString(filters);
-    return fetchApi(`/articulos${queryString}`, {}, true); // ✅ público
+    return fetchApi(`/articulos/${queryString}`, {}, true); // ✅ público
   },
 
   getCategories: () => fetchApi('/categorias/', {}, true),
@@ -146,7 +146,7 @@ export const apiService = {
 
   getMarcas: () => fetchApi("/tipo-marcas/", {}, true),
 
-  getRubros: () => fetchApi("/tipo-rubros-con-subrubros", {}, true),
+  getRubros: () => fetchApi("/tipo-rubros-con-subrubros/", {}, true),
 
   createPedido: async (pedidoData: any) => {
     console.log("📤 Enviando pedido:", pedidoData);

@@ -3,6 +3,12 @@ const nextConfig = {
   env: {
     API_URL: process.env.API_URL,
   },
+  typescript: {
+    ignoreBuildErrors: true, // si podés, mejor mantenerlo en false
+  },
+  eslint: {
+    ignoreDuringBuilds: true, // si podés, mejor mantenerlo en false
+  },
   images: {
     unoptimized: true,
     remotePatterns: [

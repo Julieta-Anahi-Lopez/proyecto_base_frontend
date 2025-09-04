@@ -199,5 +199,5 @@ export default function FiltersPanel({ rubros, marcas, onChange }: Props) {
         )}
       </div>
     </div>
-  );
+  )};
   

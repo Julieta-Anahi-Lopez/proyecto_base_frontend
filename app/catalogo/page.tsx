@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { useRouter } from "next/navigation";
+export const dynamic = "force-dynamic";
+
+import { useState, useEffect, useRef, useLayoutEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -13,7 +15,7 @@ import { useFilters, Filters } from "@/app/lib/hooks/useFilters";
 import { apiService } from "@/services/api";
 import WhatsAppButton from "../components/WhatsAppButton";
 import LoginPrompt from "../components/LoginPrompt";
-import { useSearchParams } from "next/navigation";
+
 
 
 export default function CatalogoPage() {
@@ -47,18 +49,18 @@ export default function CatalogoPage() {
   const [headerHeight, setHeaderHeight] = useState(0);
 
 
-  const searchParams = useSearchParams();
+
+ useEffect(() => {
+  const searchParams = new URLSearchParams(window.location.search);
   const nromarFromUrl = searchParams.get("nromar");
 
-  useEffect(() => {
-    if (nromarFromUrl) {
-      setFilters((prev) => ({
-        ...prev,
-        nromar: Number(nromarFromUrl),
-      }));
-    }
-  }, [nromarFromUrl]);
-
+  if (nromarFromUrl) {
+    setFilters((prev) => ({
+      ...prev,
+      nromar: Number(nromarFromUrl),
+    }));
+  }
+}, []);
 
 
 
