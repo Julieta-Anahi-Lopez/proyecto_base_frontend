@@ -69,7 +69,7 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
     }
 
     // Validar formato de teléfono (opcional)
-    if (formData.telcel && !/^\d{10}$/.test(formData.telcel)) {
+    if (formData.telcel && !/^\d{5,25}$/.test(formData.telcel)) {
       return 'El teléfono debe tener 10 dígitos';
     }
 
@@ -132,7 +132,12 @@ export default function RegisterForm({ onCancel }: { onCancel: () => void }) {
       // Manejar respuesta
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.detail || `Error en el registro: ${response.status} ${response.statusText}`);
+        const errorMessage =
+          errorData?.error || // mensaje específico del backend
+          errorData?.detail || // fallback por si usa otra clave
+          `Error en el registro: ${response.status} ${response.statusText}`; // mensaje genérico
+
+        throw new Error(errorMessage);
       }
 
       // Registro exitoso
