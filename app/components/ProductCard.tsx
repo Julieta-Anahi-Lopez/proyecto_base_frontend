@@ -8,6 +8,7 @@ import { useAuth } from "@/app/lib/hooks/useAuth";
 
 interface ProductProps {
   product: {
+    id: string,
     codigo: string;
     nombre: string;
     observ: string;
@@ -59,6 +60,7 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
     if (typeof product.precio_final !== "number") return;
   
     const item = {
+      id: product.codigo,
       codigo: product.codigo,
       nombre: product.nombre,
       precio: product.precio_final,
@@ -131,7 +133,7 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
 
           <div>
             <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
-              {normalizeText(product.nombre)}
+              {product.codigo} - {normalizeText(product.nombre)}
             </h3>
             {stockMessage && (
               <p
