@@ -196,6 +196,7 @@ export default function ProductCard({ product, isAuthenticated }: ProductProps) 
         onClose={() => setIsModalOpen(false)}
         title={normalizeText(product.nombre)}
         description={product.observ}
+        codigo={product.codigo}
       >
       <div className="relative aspect-[1/1] bg-gray-100 mb-4 rounded">
         <Image
