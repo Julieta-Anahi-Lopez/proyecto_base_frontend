@@ -8,6 +8,7 @@ import { Minus, Plus, Trash2, ShoppingCart, Package2 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { addToCart, removeFromCart, clearCart } from "@/redux/slices/cartSlice";
+import { useAuth } from "../../app/lib/hooks/useAuth";
 
 // Interfaces para pedidos
 interface PedidoDetalle {
@@ -50,7 +51,10 @@ interface CartModalProps {
   onClose: () => void;
   pedidos: Pedido[];
   pedidosLoading: boolean;
-  onSubmitOrder: (observaciones: string) => Promise<boolean>;
+  onSubmitOrder: (
+    observaciones: string,
+    items: { codigo: string; cantidad: number; precio: number }[]
+  ) => Promise<boolean>;
 }
 
 export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoading = false, onSubmitOrder }: CartModalProps) {
@@ -59,13 +63,26 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const dispatch = useDispatch();
-  
+  const { isAuthenticated } = useAuth();
+
+  const [showBankModal, setShowBankModal] = useState(false);
+  const [pedidoTotal, setPedidoTotal] = useState<number>(0);
+  const MIN_TOTAL = 50000;
+
+
+
+
+
   // Obtener items del carrito desde Redux
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const cartTotal = cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
 
   // Si el modal no está abierto, no renderizamos nada
   if (!isOpen) return null;
+
+  const user = typeof window !== "undefined"
+  ? JSON.parse(localStorage.getItem("user") || "{}")
+  : {};
 
   // Formatear fecha de pedido
   const formatDate = (dateString: string) => {
@@ -74,8 +91,8 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      // hour: '2-digit',
+      // minute: '2-digit',
     });
   };
 
@@ -87,7 +104,8 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 p-4 overflow-y-auto">
+      <div className="min-h-full flex items-center justify-center">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6 space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center border-b pb-3">
@@ -104,11 +122,10 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
         <div className="flex border-b border-gray-200">
           <button
             onClick={() => setActiveTab('cart')}
-            className={`flex items-center px-4 py-2 font-medium ${
-              activeTab === 'cart' 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
+            className={`flex items-center px-4 py-2 font-medium ${activeTab === 'cart'
+                ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <ShoppingCart size={18} className="mr-2" />
             <span>Carrito</span>
@@ -120,11 +137,10 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
           </button>
           <button
             onClick={() => setActiveTab('orders')}
-            className={`flex items-center px-4 py-2 font-medium ${
-              activeTab === 'orders' 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
+            className={`flex items-center px-4 py-2 font-medium ${activeTab === 'orders'
+                ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <Package2 size={18} className="mr-2" />
             <span>Mis Pedidos</span>
@@ -147,8 +163,8 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                 </div>
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">Tu carrito está vacío</h3>
                 <p className="text-gray-500 mb-6">Parece que aún no has agregado productos a tu carrito</p>
-                <Link 
-                  href="/" 
+                <Link
+                  href="/catalogo"
                   className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors"
                   onClick={onClose}
                 >
@@ -162,20 +178,20 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                 <div className="lg:w-2/3">
                   <div className="max-h-96 overflow-y-auto pr-2">
                     {cartItems.map((item) => (
-                      <div 
-                        key={item.codigo} 
+                      <div
+                        key={item.codigo}
                         className="flex items-center gap-4 py-4 border-b"
                       >
                         {/* Imagen del producto */}
                         <div className="relative w-16 h-16 bg-gray-100 rounded border overflow-hidden">
-                          <Image 
-                            src={item.image} 
-                            alt={item.nombre} 
+                          <Image
+                            src={item.image}
+                            alt={item.nombre}
                             fill
                             className="object-contain"
                           />
                         </div>
-                        
+
                         {/* Información del producto */}
                         <div className="flex-grow">
                           <h4 className="font-medium text-gray-800">{item.nombre}</h4>
@@ -193,9 +209,9 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                               >
                                 <Minus size={14} />
                               </button>
-                              <span className="px-2 text-sm font-medium">{item.cantidad}</span>
-                              <button 
-                                onClick={() => dispatch(addToCart(item))} 
+                              <span className="px-2 text-gray-700 text-sm font-medium">{item.cantidad}</span>
+                              <button
+                                onClick={() => dispatch(addToCart(item))}
                                 className="px-2 py-1 text-blue-600 hover:bg-blue-50"
                               >
                                 <Plus size={14} />
@@ -209,7 +225,7 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                             </button>
                           </div>
                         </div>
-                        
+
                         {/* Precio */}
                         <div className="text-right">
                           <div className="font-semibold text-blue-600">${(item.precio * item.cantidad).toFixed(2)}</div>
@@ -218,7 +234,7 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                       </div>
                     ))}
                   </div>
-                  
+
                   <button
                     onClick={() => dispatch(clearCart())}
                     className="mt-4 text-red-500 hover:text-red-700 text-sm flex items-center"
@@ -227,26 +243,26 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                     Vaciar carrito
                   </button>
                 </div>
-                
+
                 {/* Resumen del pedido */}
                 <div className="lg:w-1/3 bg-gray-50 rounded-lg p-4">
-                  <h3 className="font-bold text-lg mb-4 pb-2 border-b">Resumen del pedido</h3>
-                  
+                  <h3 className="font-bold text-gray-900 text-lg mb-4 pb-2 border-b">Resumen del pedido</h3>
+
                   <div className="space-y-3 mb-4">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Subtotal</span>
-                      <span>${cartTotal.toFixed(2)}</span>
+                      <span className="text-gray-700">Subtotal</span>
+                      <span className="text-gray-700">${cartTotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Envío</span>
+                      <span className="text-gray-900">Envío</span>
                       <span className="text-blue-600">A calcular</span>
                     </div>
                     <div className="pt-2 border-t flex justify-between font-bold">
-                      <span>Total</span>
-                      <span>${cartTotal.toFixed(2)}</span>
+                      <span className="text-gray-700">Total</span>
+                      <span className="text-gray-900">${cartTotal.toFixed(2)}</span>
                     </div>
                   </div>
-                  
+
                   {/* Campo de observaciones */}
                   <div className="mb-4">
                     <label htmlFor="observaciones" className="block text-sm font-medium text-gray-700 mb-1">
@@ -254,37 +270,77 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                     </label>
                     <textarea
                       id="observaciones"
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border text-gray-900 border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={3}
                       placeholder="Agregar instrucciones especiales o comentarios sobre el pedido..."
                       value={observaciones}
                       onChange={(e) => setObservaciones(e.target.value)}
                     />
                   </div>
-                  
+                  {/* Info adicional del usuario */}
+                  <div className="mt-4 border-t pt-4 space-y-2 text-sm text-gray-700">
+                    <div>
+                      <span className="font-bold">Dirección:</span>{" "}
+                      {user.domcal || '—'} {user.domnro || '—'}
+                    </div>
+                    <div>
+                      <span className="font-bold">CUIT / DNI:</span>{" "}
+                      {user.cuit && user.cuit !== "Sin cuit" ? user.cuit : user.dni || '—'}
+                    </div>
+                    <div>
+                      <span className="font-bold">Condición IVA:</span>{" "}
+                      {user.catIva || user.cativa || 'Consumidor Final'}
+                    </div>
+                  </div>
+
                   {/* Error de envío si existe */}
                   {submitError && (
                     <div className="bg-red-50 text-red-600 p-2 rounded-md text-sm mb-4">
                       {submitError}
                     </div>
                   )}
-                  
-                  <button 
-                    className={`w-full bg-blue-600 text-white py-3 rounded-md font-medium transition-colors ${
-                      isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'
-                    }`}
+
+                  {cartTotal < MIN_TOTAL && (
+                    <div className="bg-yellow-100 text-yellow-800 p-3 rounded-md text-sm mb-4 border border-yellow-300">
+                      Te faltan <strong>${(MIN_TOTAL - cartTotal).toFixed(2)}</strong> para alcanzar el mínimo de <strong>${MIN_TOTAL.toLocaleString()}</strong> requerido para realizar un pedido.
+                    </div>
+                  )}
+
+
+
+                  <button
+                    className={`w-full py-3 rounded-md font-medium transition-colors ${isSubmitting || cartItems.length === 0 || cartTotal < MIN_TOTAL
+                        ? 'bg-blue-400 cursor-not-allowed'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                      }`}
                     onClick={async () => {
-                      if (isSubmitting || cartItems.length === 0) return;
-                      
+                      if (!isAuthenticated) {
+                        setSubmitError("Debes iniciar sesión para enviar un pedido.");
+                        return;
+                      }
+
+                      if (isSubmitting || cartItems.length === 0 || cartTotal < MIN_TOTAL) return;
+
                       setIsSubmitting(true);
                       setSubmitError(null);
-                      
+
                       try {
-                        const success = await onSubmitOrder(observaciones);
+                        const simplifiedItems = cartItems.map(({ codigo, cantidad, precio }) => ({
+                          codigo,
+                          cantidad,
+                          precio,
+                        }));
+
+                        const success = await onSubmitOrder(observaciones, simplifiedItems);
                         if (success) {
+                          const total = cartItems.reduce(
+                            (total, item) => total + item.precio * item.cantidad,
+                            0
+                          );
+                          setPedidoTotal(total);
                           dispatch(clearCart());
                           setObservaciones("");
-                          onClose();
+                          setShowBankModal(true);
                         }
                       } catch (error) {
                         console.error("Error al enviar pedido:", error);
@@ -293,7 +349,7 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                         setIsSubmitting(false);
                       }
                     }}
-                    disabled={isSubmitting || cartItems.length === 0}
+                    disabled={isSubmitting || cartItems.length === 0 || cartTotal < MIN_TOTAL}
                   >
                     {isSubmitting ? (
                       <span className="flex items-center justify-center">
@@ -307,9 +363,10 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                       "Realizar pedido"
                     )}
                   </button>
-                  
+
+
                   <p className="text-xs text-gray-500 text-center mt-3">
-                    Al hacer click, enviarás tu pedido a nuestro sistema y te contactaremos para coordinar el envío y pago.
+                    Al hacer click, enviarás tu pedido a nuestro sistema. A continuacion podés realizar el pago y enviar el comprobante por Whatsapp o bien, comunicarte con nosotros para coordinar pago y envío.
                   </p>
                 </div>
               </div>
@@ -351,7 +408,7 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                           {pedido.detalles.length} artículos
                         </span>
                       </div>
-                      
+
                       {/* Detalles del pedido */}
                       <div className="space-y-2 mb-3">
                         {pedido.detalles.map((detalle) => (
@@ -367,11 +424,11 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
                           </div>
                         ))}
                       </div>
-                      
+
                       {/* Total y observaciones */}
                       <div className="mt-3 pt-2 border-t">
                         {pedido.observ && pedido.observ !== "Sin observaciones" && (
-                          <p className="text-sm text-gray-600 mb-2">
+                          <p className="text-sm text-gray-900 mb-2">
                             <span className="font-medium">Observaciones:</span> {pedido.observ}
                           </p>
                         )}
@@ -400,7 +457,62 @@ export default function CartModal({ isOpen, onClose, pedidos = [], pedidosLoadin
           </button>
         </div>
       </div>
-    </div>
+      {showBankModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[999] p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 space-y-4 relative">
+            <button
+              onClick={() => setShowBankModal(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-xl leading-none"
+            >
+              ✖
+            </button>
+            <h2 className="text-xl font-bold text-gray-800">Información para el pago</h2>
+
+            <div className="space-y-2 text-sm text-gray-700">
+              <p><strong>Total del pedido:</strong> ${pedidoTotal.toFixed(2)}</p>
+              <p><strong>Banco:</strong> Banco Nación</p>
+              <p><strong>CBU:</strong> 0110123456789012345678</p>
+              <p><strong>Alias:</strong> mi.negocio.transfer</p>
+            </div>
+
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText("0110123456789012345678");
+              }}
+              className="w-full bg-gray-200 hover:bg-gray-300 text-sm text-gray-700 py-2 rounded transition"
+            >
+              Copiar CBU
+            </button>
+
+            <button
+              onClick={() => {
+                const mensaje = `Hola, acabo de realizar un pedido de $${pedidoTotal.toFixed(
+                  2
+                )}. Adjunto comprobante de transferencia.`;
+                window.open(
+                  `https://wa.me/5492914732827?text=${encodeURIComponent(mensaje)}`,
+                  "_blank"
+                );
+              }}
+              className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 rounded transition flex justify-center items-center gap-2"
+            >
+              <svg
+                fill="currentColor"
+                viewBox="0 0 32 32"
+                className="w-5 h-5"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M16 .396C7.176.396.001 7.57.001 16.396c0 2.907.765 5.65 2.21 8.087L.06 32l7.308-2.14a15.82 15.82 0 008.63 2.536c8.824 0 15.999-7.173 15.999-16S24.824.396 16 .396zM16 29.93c-2.786 0-5.505-.772-7.87-2.237l-.564-.337-4.348 1.272 1.3-4.236-.366-.606a13.88 13.88 0 01-2.068-7.09c0-7.732 6.29-14.02 14.02-14.02S30.02 8.664 30.02 16.396 23.732 29.93 16 29.93zm8.148-10.368c-.447-.223-2.646-1.304-3.057-1.453-.41-.15-.708-.223-1.006.223-.297.446-1.15 1.453-1.41 1.75-.26.297-.518.335-.965.112-.447-.223-1.89-.693-3.6-2.211-1.33-1.19-2.227-2.656-2.488-3.102-.26-.446-.028-.685.195-.908.2-.2.447-.52.67-.78.224-.26.298-.446.447-.743.15-.297.075-.56-.037-.78-.112-.223-1.006-2.42-1.378-3.314-.363-.868-.735-.752-1.006-.766l-.86-.015c-.297 0-.78.112-1.187.56-.41.447-1.56 1.52-1.56 3.706s1.596 4.3 1.817 4.593c.223.297 3.132 4.778 7.595 6.703.63.27 1.12.43 1.505.55.63.2 1.202.172 1.654.105.504-.075 1.56-.637 1.78-1.253.223-.618.223-1.15.15-1.253-.075-.104-.28-.164-.728-.372z" />
+              </svg>
+              Enviar comprobante
+            </button>
+          </div>
+        </div>
+      )}
+
+</div> // cierre de min-h-full flex
+</div> // cierre de fixed inset-0
+
   );
 }
 

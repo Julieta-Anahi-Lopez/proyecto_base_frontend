@@ -6,10 +6,11 @@ interface ModalProps {
   onClose: () => void
   title: string
   description?: string
+  codigo: string
   children: React.ReactNode
 }
 
-export default function Modal({ isOpen, onClose, title, description, children }: ModalProps) {
+export default function Modal({ isOpen, onClose, title, description, codigo, children }: ModalProps) {
   if (!isOpen) return null
 
   return (
@@ -18,7 +19,7 @@ export default function Modal({ isOpen, onClose, title, description, children }:
         {/* Header */}
         <div className="flex justify-between items-start border-b pb-2">
         <div>
-            <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+            <h2 className="text-lg font-semibold text-gray-800">{codigo} - {title}</h2>
             {description && (
               <p className="text-sm text-gray-500 mt-1">{description}</p>
             )}

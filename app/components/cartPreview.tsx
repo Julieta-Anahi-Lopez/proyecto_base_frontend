@@ -168,7 +168,7 @@ export default function CartPreview({ cartItems, pedidos, pedidosLoading, dispat
                             >
                               <Minus size={14} />
                             </button>
-                            <span className="px-2 text-sm font-medium">{item.cantidad}</span>
+                            <span className="px-2 text-gray-700 text-sm font-medium">{item.cantidad}</span>
                             <button 
                               onClick={() => dispatch(addToCart(item))} 
                               className="px-2 py-1 text-blue-600 hover:bg-blue-50"

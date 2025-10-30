@@ -11,16 +11,22 @@ interface Product {
 
 interface ProductGridProps {
   products: Product[]
+  isAuthenticated: boolean;
 }
 
-export default function ProductGrid({ products }: ProductGridProps) {
+export default function ProductGrid({ products, isAuthenticated  }: ProductGridProps) {
   return (
-    <div className="flex-grow bg-white p-4">
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
-        {products.map((product) => (
-          <ProductCard key={product.codigo} product={product} />
-        ))}
+    <div className="flex-grow bg-white py-4">
+      <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-20 2xl:px-28">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {products.map((product) => (
+            <ProductCard
+              key={product.codigo}
+              product={product}
+              isAuthenticated={isAuthenticated}
+            />
+          ))}
+        </div>
       </div>
     </div>
-  )
-}
+  )};
